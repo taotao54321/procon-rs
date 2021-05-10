@@ -22,6 +22,23 @@ macro_rules! chmax {
     }};
 }
 
+/// 多次元 Vec を作る。
+///
+/// ```
+/// # use procon_rs_prelude::ndvec;
+/// let dp = ndvec![0; 2, 3, 4];
+/// assert_eq!(dp, vec![vec![vec![0; 4]; 3]; 2]);
+/// ```
+#[macro_export]
+macro_rules! ndvec {
+    ($elem:expr; $n:expr) => {{
+        ::std::vec![$elem; $n]
+    }};
+    ($elem:expr; $n:expr, $($ns:expr),+ $(,)?) => {{
+        ::std::vec![ndvec![$elem; $($ns),+]; $n]
+    }};
+}
+
 /// 競プロ向けデバッグマクロ。std::dbg! の代替品。
 ///
 /// * リリースビルドでは何もしない。
@@ -87,5 +104,12 @@ mod tests {
             assert!(chmax!(x, 7));
             assert_eq!(x, 7);
         }
+    }
+
+    #[test]
+    fn test_ndvec() {
+        assert_eq!(ndvec![0; 3], vec![0; 3]);
+        assert_eq!(ndvec![0; 2, 3, 4], vec![vec![vec![0; 4]; 3]; 2]);
+        assert_eq!(ndvec![0; 2, 3, 4,], vec![vec![vec![0; 4]; 3]; 2]);
     }
 }
