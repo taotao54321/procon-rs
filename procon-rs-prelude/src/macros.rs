@@ -35,7 +35,7 @@ macro_rules! ndvec {
         ::std::vec![$elem; $n]
     }};
     ($elem:expr; $n:expr, $($ns:expr),+ $(,)?) => {{
-        ::std::vec![ndvec![$elem; $($ns),+]; $n]
+        ::std::vec![$crate::ndvec![$elem; $($ns),+]; $n]
     }};
 }
 
