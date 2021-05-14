@@ -62,7 +62,7 @@ macro_rules! debug {
 #[macro_export]
 macro_rules! dbg {
     ($($_:expr),* $(,)*) => {{
-        ::std::compile_error!("DO NOT USE std::dbg! for procon!");
+        ::std::compile_error!("use debug!() instead of std::dbg!()");
     }};
 }
 
