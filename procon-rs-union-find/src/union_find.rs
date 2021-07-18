@@ -32,12 +32,9 @@ impl UnionFind {
         }
 
         // 経路圧縮
-        self.parent_or_len[v] = self
-            .root(self.parent_or_len[v].try_into().unwrap())
-            .try_into()
-            .unwrap();
-
-        self.parent_or_len[v].try_into().unwrap()
+        let root = self.root(self.parent_or_len[v].try_into().unwrap());
+        self.parent_or_len[v] = root.try_into().unwrap();
+        root
     }
 
     /// 頂点 v が属する集合の頂点数を返す。
@@ -64,6 +61,9 @@ impl UnionFind {
 
         let mut root_v = self.root(v);
         let mut root_w = self.root(w);
+        if root_v == root_w {
+            return;
+        }
 
         // union by size
         let len_v = -self.parent_or_len[root_v];
@@ -106,6 +106,8 @@ mod tests {
     fn test_union_find() {
         let mut uf = UnionFind::new(5);
 
+        // 初期状態
+
         assert_eq!(uf.len(), 5);
         assert!(!uf.is_empty());
         assert_eq!(uf.root(0), 0);
@@ -115,6 +117,8 @@ mod tests {
             uf.groups(),
             vec![vec![0], vec![1], vec![2], vec![3], vec![4]]
         );
+
+        // 併合後
 
         uf.unite(0, 4);
         uf.unite(1, 3);
@@ -129,5 +133,12 @@ mod tests {
         let mut groups = uf.groups();
         groups.sort();
         assert_eq!(groups, vec![vec![0, 4], vec![1, 3], vec![2]]);
+
+        // 同じ集合内での unite で壊れないことを確認
+        // (チェックを忘れている場合、root() が無限再帰に陥る)
+
+        uf.unite(0, 4);
+
+        assert!(uf.is_same(0, 4));
     }
 }
