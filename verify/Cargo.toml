@@ -1,0 +1,11 @@
+[package]
+name = "verify"
+version = "0.1.0"
+authors = ["taotao54321 <taotao54321@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+proconio = { version = "=0.3.6", features = ["derive"] }
+
+procon-rs-prelude = { path = "../procon-rs-prelude" }
+procon-rs-union-find = { path = "../procon-rs-union-find" }

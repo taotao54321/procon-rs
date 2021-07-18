@@ -2,4 +2,5 @@
 members = [
     "procon-rs-prelude",
     "procon-rs-union-find",
+    "verify",
 ]
