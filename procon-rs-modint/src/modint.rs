@@ -190,12 +190,12 @@ impl<M: StaticModulus> std::fmt::Display for StaticModInt<M> {
 macro_rules! impl_unary_op {
     (
         <$($param:ident : $bound:tt),*>, $trait:ident, $method:ident,
-        |$this:ident : $this_ty:ty| -> $out_ty:ty $body:block
+        |$this:ident : &$this_ty:ty| -> $out_ty:ty $body:block
     ) => {
         impl<$($param: $bound),*> ::std::ops::$trait for $this_ty {
             type Output = $out_ty;
             fn $method(self) -> Self::Output {
-                let $this = self;
+                let $this = &self;
                 $body
             }
         }
@@ -212,19 +212,20 @@ macro_rules! impl_unary_op {
 macro_rules! impl_binary_op {
     (
         <$($param:ident : $bound:tt),*>, $trait:ident, $method:ident,
-        |$lhs:ident : $lhs_ty:ty, $rhs:ident : $rhs_ty:ty| -> $out_ty:ty $body:block
+        |$lhs:ident : &$lhs_ty:ty, $rhs:ident : &$rhs_ty:ty| -> $out_ty:ty $body:block
     ) => {
         impl<$($param: $bound),*> ::std::ops::$trait<$rhs_ty> for $lhs_ty {
             type Output = $out_ty;
             fn $method(self, $rhs: $rhs_ty) -> Self::Output {
-                let $lhs = self;
+                let $lhs = &self;
+                let $rhs = &$rhs;
                 $body
             }
         }
         impl<$($param: $bound),*> ::std::ops::$trait<&$rhs_ty> for $lhs_ty {
             type Output = $out_ty;
             fn $method(self, $rhs: &$rhs_ty) -> Self::Output {
-                let $lhs = self;
+                let $lhs = &self;
                 $body
             }
         }
@@ -232,6 +233,7 @@ macro_rules! impl_binary_op {
             type Output = $out_ty;
             fn $method(self, $rhs: $rhs_ty) -> Self::Output {
                 let $lhs = self;
+                let $rhs = &$rhs;
                 $body
             }
         }
@@ -248,15 +250,15 @@ macro_rules! impl_binary_op {
 macro_rules! impl_binary_op_commutative {
     (
         <$($param:ident : $bound:tt),*>, $trait:ident, $method:ident,
-        |$lhs:ident : $lhs_ty:ty, $rhs:ident : $rhs_ty:ty| -> $out_ty:ty $body:block
+        |$lhs:ident : &$lhs_ty:ty, $rhs:ident : &$rhs_ty:ty| -> $out_ty:ty $body:block
     ) => {
         impl_binary_op!(
             <$($param: $bound),*>, $trait, $method,
-            |$lhs: $lhs_ty, $rhs: $rhs_ty| -> $out_ty $body
+            |$lhs: &$lhs_ty, $rhs: &$rhs_ty| -> $out_ty $body
         );
         impl_binary_op!(
             <$($param: $bound),*>, $trait, $method,
-            |$rhs: $rhs_ty, $lhs: $lhs_ty| -> $out_ty $body
+            |$rhs: &$rhs_ty, $lhs: &$lhs_ty| -> $out_ty $body
         );
     };
 }
@@ -264,71 +266,72 @@ macro_rules! impl_binary_op_commutative {
 macro_rules! impl_binary_op_lhs_rem_euclid_u32 {
     (
         <$($param:ident : $bound:tt),*>, $trait:ident, $method:ident,
-        |$lhs:ident, $rhs:ident : $rhs_ty:ty| -> $out_ty:ty $body:block
+        |$lhs:ident, $rhs:ident : &$rhs_ty:ty| -> $out_ty:ty $body:block
     ) => {
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: i8,    $rhs: $rhs_ty| -> $out_ty $body);
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: i16,   $rhs: $rhs_ty| -> $out_ty $body);
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: i32,   $rhs: $rhs_ty| -> $out_ty $body);
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: i64,   $rhs: $rhs_ty| -> $out_ty $body);
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: i128,  $rhs: $rhs_ty| -> $out_ty $body);
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: isize, $rhs: $rhs_ty| -> $out_ty $body);
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: u8,    $rhs: $rhs_ty| -> $out_ty $body);
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: u16,   $rhs: $rhs_ty| -> $out_ty $body);
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: u32,   $rhs: $rhs_ty| -> $out_ty $body);
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: u64,   $rhs: $rhs_ty| -> $out_ty $body);
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: u128,  $rhs: $rhs_ty| -> $out_ty $body);
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: usize, $rhs: $rhs_ty| -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &i8,    $rhs: &$rhs_ty| -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &i16,   $rhs: &$rhs_ty| -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &i32,   $rhs: &$rhs_ty| -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &i64,   $rhs: &$rhs_ty| -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &i128,  $rhs: &$rhs_ty| -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &isize, $rhs: &$rhs_ty| -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &u8,    $rhs: &$rhs_ty| -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &u16,   $rhs: &$rhs_ty| -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &u32,   $rhs: &$rhs_ty| -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &u64,   $rhs: &$rhs_ty| -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &u128,  $rhs: &$rhs_ty| -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &usize, $rhs: &$rhs_ty| -> $out_ty $body);
     };
 }
 
 macro_rules! impl_binary_op_rhs_rem_euclid_u32 {
     (
         <$($param:ident : $bound:tt),*>, $trait:ident, $method:ident,
-        |$lhs:ident : $lhs_ty:ty, $rhs:ident| -> $out_ty:ty $body:block
+        |$lhs:ident : &$lhs_ty:ty, $rhs:ident| -> $out_ty:ty $body:block
     ) => {
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: i8   | -> $out_ty $body);
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: i16  | -> $out_ty $body);
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: i32  | -> $out_ty $body);
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: i64  | -> $out_ty $body);
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: i128 | -> $out_ty $body);
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: isize| -> $out_ty $body);
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: u8   | -> $out_ty $body);
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: u16  | -> $out_ty $body);
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: u32  | -> $out_ty $body);
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: u64  | -> $out_ty $body);
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: u128 | -> $out_ty $body);
-        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: usize| -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &i8   | -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &i16  | -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &i32  | -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &i64  | -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &i128 | -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &isize| -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &u8   | -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &u16  | -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &u32  | -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &u64  | -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &u128 | -> $out_ty $body);
+        impl_binary_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &usize| -> $out_ty $body);
     };
 }
 
 macro_rules! impl_binary_op_commutative_rhs_rem_euclid_u32 {
     (
         <$($param:ident : $bound:tt),*>, $trait:ident, $method:ident,
-        |$lhs:ident : $lhs_ty:ty, $rhs:ident| -> $out_ty:ty $body:block
+        |$lhs:ident : &$lhs_ty:ty, $rhs:ident| -> $out_ty:ty $body:block
     ) => {
-        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: i8   | -> $out_ty $body);
-        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: i16  | -> $out_ty $body);
-        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: i32  | -> $out_ty $body);
-        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: i64  | -> $out_ty $body);
-        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: i128 | -> $out_ty $body);
-        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: isize| -> $out_ty $body);
-        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: u8   | -> $out_ty $body);
-        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: u16  | -> $out_ty $body);
-        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: u32  | -> $out_ty $body);
-        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: u64  | -> $out_ty $body);
-        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: u128 | -> $out_ty $body);
-        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: usize| -> $out_ty $body);
+        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &i8   | -> $out_ty $body);
+        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &i16  | -> $out_ty $body);
+        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &i32  | -> $out_ty $body);
+        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &i64  | -> $out_ty $body);
+        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &i128 | -> $out_ty $body);
+        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &isize| -> $out_ty $body);
+        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &u8   | -> $out_ty $body);
+        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &u16  | -> $out_ty $body);
+        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &u32  | -> $out_ty $body);
+        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &u64  | -> $out_ty $body);
+        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &u128 | -> $out_ty $body);
+        impl_binary_op_commutative!(<$($param: $bound),*>, $trait, $method, |$lhs: &$lhs_ty, $rhs: &usize| -> $out_ty $body);
     };
 }
 
 macro_rules! impl_assign_op {
     (
         <$($param:ident : $bound:tt),*>, $trait:ident, $method:ident,
-        |$lhs:ident : $lhs_ty:ty, $rhs:ident : $rhs_ty:ty| $body:block
+        |$lhs:ident : &mut $lhs_ty:ty, $rhs:ident : &$rhs_ty:ty| $body:block
     ) => {
         impl<$($param: $bound),*> ::std::ops::$trait<$rhs_ty> for $lhs_ty {
             fn $method(&mut self, $rhs: $rhs_ty) {
                 let $lhs = self;
+                let $rhs = &$rhs;
                 $body
             }
         }
@@ -344,30 +347,30 @@ macro_rules! impl_assign_op {
 macro_rules! impl_assign_op_rhs_rem_euclid_u32 {
     (
         <$($param:ident : $bound:tt),*>, $trait:ident, $method:ident,
-        |$lhs:ident : $lhs_ty:ty, $rhs:ident| $body:block
+        |$lhs:ident : &mut $lhs_ty:ty, $rhs:ident| $body:block
     ) => {
-        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: i8   | $body);
-        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: i16  | $body);
-        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: i32  | $body);
-        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: i64  | $body);
-        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: i128 | $body);
-        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: isize| $body);
-        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: u8   | $body);
-        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: u16  | $body);
-        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: u32  | $body);
-        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: u64  | $body);
-        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: u128 | $body);
-        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: $lhs_ty, $rhs: usize| $body);
+        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &mut $lhs_ty, $rhs: &i8   | $body);
+        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &mut $lhs_ty, $rhs: &i16  | $body);
+        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &mut $lhs_ty, $rhs: &i32  | $body);
+        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &mut $lhs_ty, $rhs: &i64  | $body);
+        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &mut $lhs_ty, $rhs: &i128 | $body);
+        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &mut $lhs_ty, $rhs: &isize| $body);
+        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &mut $lhs_ty, $rhs: &u8   | $body);
+        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &mut $lhs_ty, $rhs: &u16  | $body);
+        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &mut $lhs_ty, $rhs: &u32  | $body);
+        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &mut $lhs_ty, $rhs: &u64  | $body);
+        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &mut $lhs_ty, $rhs: &u128 | $body);
+        impl_assign_op!(<$($param: $bound),*>, $trait, $method, |$lhs: &mut $lhs_ty, $rhs: &usize| $body);
     };
 }
 
 // Neg
-impl_unary_op!(<M: StaticModulus>, Neg, neg, |this: StaticModInt<M>| -> StaticModInt<M> {
+impl_unary_op!(<M: StaticModulus>, Neg, neg, |this: &StaticModInt<M>| -> StaticModInt<M> {
     StaticModInt::<M>::new_unchecked(0) - this
 });
 
 // Add
-impl_binary_op!(<M: StaticModulus>, Add, add, |lhs: StaticModInt<M>, rhs: StaticModInt<M>| -> StaticModInt<M> {
+impl_binary_op!(<M: StaticModulus>, Add, add, |lhs: &StaticModInt<M>, rhs: &StaticModInt<M>| -> StaticModInt<M> {
     let modulus = M::VALUE;
     let mut value = lhs.value + rhs.value;
     if value >= modulus {
@@ -375,13 +378,12 @@ impl_binary_op!(<M: StaticModulus>, Add, add, |lhs: StaticModInt<M>, rhs: Static
     }
     StaticModInt::<M>::new_unchecked(value)
 });
-impl_binary_op_commutative_rhs_rem_euclid_u32!(<M: StaticModulus>, Add, add, |lhs: StaticModInt<M>, rhs| -> StaticModInt<M> {
-    #[allow(clippy::identity_op)]
-    { lhs + StaticModInt::<M>::new(rhs + 0) }
+impl_binary_op_commutative_rhs_rem_euclid_u32!(<M: StaticModulus>, Add, add, |lhs: &StaticModInt<M>, rhs| -> StaticModInt<M> {
+    lhs + StaticModInt::<M>::new(*rhs)
 });
 
 // Sub
-impl_binary_op!(<M: StaticModulus>, Sub, sub, |lhs: StaticModInt<M>, rhs: StaticModInt<M>| -> StaticModInt<M> {
+impl_binary_op!(<M: StaticModulus>, Sub, sub, |lhs: &StaticModInt<M>, rhs: &StaticModInt<M>| -> StaticModInt<M> {
     let modulus = M::VALUE;
     let mut value = lhs.value.wrapping_sub(rhs.value);
     if value >= modulus {
@@ -389,46 +391,43 @@ impl_binary_op!(<M: StaticModulus>, Sub, sub, |lhs: StaticModInt<M>, rhs: Static
     }
     StaticModInt::<M>::new_unchecked(value)
 });
-impl_binary_op_lhs_rem_euclid_u32!(<M: StaticModulus>, Sub, sub, |lhs, rhs: StaticModInt<M>| -> StaticModInt<M> {
-    #[allow(clippy::identity_op)]
-    { StaticModInt::<M>::new(lhs + 0) - rhs }
+impl_binary_op_lhs_rem_euclid_u32!(<M: StaticModulus>, Sub, sub, |lhs, rhs: &StaticModInt<M>| -> StaticModInt<M> {
+    StaticModInt::<M>::new(*lhs) - rhs
 });
-impl_binary_op_rhs_rem_euclid_u32!(<M: StaticModulus>, Sub, sub, |lhs: StaticModInt<M>, rhs| -> StaticModInt<M> {
-    #[allow(clippy::identity_op)]
-    { lhs - StaticModInt::<M>::new(rhs + 0) }
+impl_binary_op_rhs_rem_euclid_u32!(<M: StaticModulus>, Sub, sub, |lhs: &StaticModInt<M>, rhs| -> StaticModInt<M> {
+    lhs - StaticModInt::<M>::new(*rhs)
 });
 
 // Mul
-impl_binary_op!(<M: StaticModulus>, Mul, mul, |lhs: StaticModInt<M>, rhs: StaticModInt<M>| -> StaticModInt<M> {
+impl_binary_op!(<M: StaticModulus>, Mul, mul, |lhs: &StaticModInt<M>, rhs: &StaticModInt<M>| -> StaticModInt<M> {
     let value = (u64::from(lhs.value) * u64::from(rhs.value) % u64::from(M::VALUE)) as u32;
     StaticModInt::<M>::new_unchecked(value)
 });
-impl_binary_op_commutative_rhs_rem_euclid_u32!(<M: StaticModulus>, Mul, mul, |lhs: StaticModInt<M>, rhs| -> StaticModInt<M> {
-    #[allow(clippy::identity_op)]
-    { lhs * StaticModInt::<M>::new(rhs + 0) }
+impl_binary_op_commutative_rhs_rem_euclid_u32!(<M: StaticModulus>, Mul, mul, |lhs: &StaticModInt<M>, rhs| -> StaticModInt<M> {
+    lhs * StaticModInt::<M>::new(*rhs)
 });
 
 // AddAssign
-impl_assign_op!(<M: StaticModulus>, AddAssign, add_assign, |lhs: StaticModInt<M>, rhs: StaticModInt<M>| {
+impl_assign_op!(<M: StaticModulus>, AddAssign, add_assign, |lhs: &mut StaticModInt<M>, rhs: &StaticModInt<M>| {
     *lhs = *lhs + rhs;
 });
-impl_assign_op_rhs_rem_euclid_u32!(<M: StaticModulus>, AddAssign, add_assign, |lhs: StaticModInt<M>, rhs| {
+impl_assign_op_rhs_rem_euclid_u32!(<M: StaticModulus>, AddAssign, add_assign, |lhs: &mut StaticModInt<M>, rhs| {
     *lhs = *lhs + rhs;
 });
 
 // SubAssign
-impl_assign_op!(<M: StaticModulus>, SubAssign, sub_assign, |lhs: StaticModInt<M>, rhs: StaticModInt<M>| {
+impl_assign_op!(<M: StaticModulus>, SubAssign, sub_assign, |lhs: &mut StaticModInt<M>, rhs: &StaticModInt<M>| {
     *lhs = *lhs - rhs;
 });
-impl_assign_op_rhs_rem_euclid_u32!(<M: StaticModulus>, SubAssign, sub_assign, |lhs: StaticModInt<M>, rhs| {
+impl_assign_op_rhs_rem_euclid_u32!(<M: StaticModulus>, SubAssign, sub_assign, |lhs: &mut StaticModInt<M>, rhs| {
     *lhs = *lhs - rhs;
 });
 
 // MulAssign
-impl_assign_op!(<M: StaticModulus>, MulAssign, mul_assign, |lhs: StaticModInt<M>, rhs: StaticModInt<M>| {
+impl_assign_op!(<M: StaticModulus>, MulAssign, mul_assign, |lhs: &mut StaticModInt<M>, rhs: &StaticModInt<M>| {
     *lhs = *lhs * rhs;
 });
-impl_assign_op_rhs_rem_euclid_u32!(<M: StaticModulus>, MulAssign, mul_assign, |lhs: StaticModInt<M>, rhs| {
+impl_assign_op_rhs_rem_euclid_u32!(<M: StaticModulus>, MulAssign, mul_assign, |lhs: &mut StaticModInt<M>, rhs| {
     *lhs = *lhs * rhs;
 });
 
