@@ -9,3 +9,4 @@ proconio = { version = "=0.3.6", features = ["derive"] }
 
 procon-rs-prelude = { path = "../procon-rs-prelude" }
 procon-rs-union-find = { path = "../procon-rs-union-find" }
+procon-rs-modint = { path = "../procon-rs-modint" }
