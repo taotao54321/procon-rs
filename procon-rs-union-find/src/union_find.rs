@@ -1,5 +1,3 @@
-use std::convert::TryInto;
-
 #[derive(Clone, Debug)]
 pub struct UnionFind {
     parent_or_len: Vec<i32>,
@@ -8,6 +6,8 @@ pub struct UnionFind {
 impl UnionFind {
     /// 頂点数 n の UnionFind を作る。
     pub fn new(n: usize) -> Self {
+        assert!(n <= i32::max_value() as usize);
+
         Self {
             parent_or_len: vec![-1; n],
         }
@@ -32,8 +32,8 @@ impl UnionFind {
         }
 
         // 経路圧縮
-        let root = self.root(self.parent_or_len[v].try_into().unwrap());
-        self.parent_or_len[v] = root.try_into().unwrap();
+        let root = self.root(self.parent_or_len[v] as usize);
+        self.parent_or_len[v] = root as i32;
         root
     }
 
@@ -43,7 +43,7 @@ impl UnionFind {
 
         let root = self.root(v);
 
-        (-self.parent_or_len[root]).try_into().unwrap()
+        (-self.parent_or_len[root]) as usize
     }
 
     /// 頂点 v, w が同じ集合に属すかどうかを返す。
@@ -73,7 +73,7 @@ impl UnionFind {
         }
 
         self.parent_or_len[root_v] = -(len_v + len_w);
-        self.parent_or_len[root_w] = root_v.try_into().unwrap();
+        self.parent_or_len[root_w] = root_v as i32;
     }
 
     /// 全ての集合を返す。
@@ -82,7 +82,7 @@ impl UnionFind {
             .map(|v| {
                 let p = self.parent_or_len[v];
                 if p < 0 {
-                    Some(Vec::with_capacity((-p).try_into().unwrap()))
+                    Some(Vec::with_capacity((-p) as usize))
                 } else {
                     None
                 }
