@@ -49,6 +49,26 @@ impl<M: StaticModulus> StaticModInt<M> {
 
         res
     }
+
+    /// self.value() == 0 の場合、panic する。
+    /// gcd(self.value(), M::VALUE) != 1 の場合、panic する。
+    pub fn inv(self) -> Self {
+        fn extgcd(a: i32, b: i32) -> (i32, i32) {
+            if b == 0 {
+                assert_eq!(a, 1);
+                return (1, 0);
+            }
+            let (q, r) = (a / b, a % b);
+            let (xx, yy) = extgcd(b, r);
+            (yy, xx - q * yy)
+        }
+
+        assert_ne!(self.value, 0);
+
+        let x = extgcd(self.value as i32, M::VALUE as i32).0;
+        let value = (if x >= 0 { x } else { x + M::VALUE as i32 }) as u32;
+        Self::new_unchecked(value)
+    }
 }
 
 pub trait StaticModulus {
@@ -476,6 +496,19 @@ mod tests {
         assert_eq!(pow(2, 10), 1024);
         assert_eq!(pow(2, 32), 294_967_268);
         assert_eq!(pow(2, 1_000_000_006), 1);
+    }
+
+    #[test]
+    fn static_modint_inv() {
+        fn inv(value: u32) -> u32 {
+            ModInt1000000007::new(value).inv().value()
+        }
+
+        assert_eq!(inv(1), 1);
+        assert_eq!(inv(2), 500_000_004);
+        assert_eq!(inv(3), 333_333_336);
+        assert_eq!(inv(42), 23_809_524);
+        assert_eq!(inv(1_000_000_006), 1_000_000_006);
     }
 
     #[test]
