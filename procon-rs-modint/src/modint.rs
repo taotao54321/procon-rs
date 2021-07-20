@@ -1,6 +1,8 @@
-//! 法は 2^31 以下であることを仮定している。そうでない場合の挙動は未定義。
+//! 法は 2 以上 2^31 以下であることを仮定している。そうでない場合の挙動は未定義。
 
 use std::marker::PhantomData;
+
+use num_traits::{One, Zero};
 
 pub type ModInt1000000007 = StaticModInt<Mod1000000007>;
 pub type ModInt1000000009 = StaticModInt<Mod1000000009>;
@@ -71,7 +73,7 @@ impl<M: StaticModulus> StaticModInt<M> {
     }
 }
 
-pub trait StaticModulus {
+pub trait StaticModulus: 'static {
     const VALUE: u32;
 }
 
@@ -451,6 +453,62 @@ impl_assign_op_rhs_rem_euclid_u32!(<M: StaticModulus>, MulAssign, mul_assign, |l
     *lhs = *lhs * rhs;
 });
 
+impl<M: StaticModulus> std::iter::Sum<Self> for StaticModInt<M> {
+    fn sum<I>(it: I) -> Self
+    where
+        I: Iterator<Item = Self>,
+    {
+        it.fold(Self::zero(), std::ops::Add::add)
+    }
+}
+
+impl<'a, M: StaticModulus> std::iter::Sum<&'a Self> for StaticModInt<M> {
+    fn sum<I>(it: I) -> Self
+    where
+        I: Iterator<Item = &'a Self>,
+    {
+        it.fold(Self::zero(), std::ops::Add::add)
+    }
+}
+
+impl<M: StaticModulus> std::iter::Product<Self> for StaticModInt<M> {
+    fn product<I>(it: I) -> Self
+    where
+        I: Iterator<Item = Self>,
+    {
+        it.fold(Self::one(), std::ops::Mul::mul)
+    }
+}
+
+impl<'a, M: StaticModulus> std::iter::Product<&'a Self> for StaticModInt<M> {
+    fn product<I>(it: I) -> Self
+    where
+        I: Iterator<Item = &'a Self>,
+    {
+        it.fold(Self::one(), std::ops::Mul::mul)
+    }
+}
+
+impl<M: StaticModulus> Zero for StaticModInt<M> {
+    fn zero() -> Self {
+        Self::new_unchecked(0)
+    }
+
+    fn is_zero(&self) -> bool {
+        self.value == 0
+    }
+}
+
+impl<M: StaticModulus> One for StaticModInt<M> {
+    fn one() -> Self {
+        Self::new_unchecked(1)
+    }
+
+    fn is_one(&self) -> bool {
+        self.value == 1
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -695,5 +753,33 @@ mod tests {
             a *= &2;
             assert_eq!(a.value(), 8);
         }
+    }
+
+    #[test]
+    fn static_modint_sum() {
+        fn sum(values: impl AsRef<[i32]>) -> ModInt1000000007 {
+            values
+                .as_ref()
+                .iter()
+                .copied()
+                .map(ModInt1000000007::new)
+                .sum()
+        }
+
+        assert_eq!(sum([-1, 2, -3, 4, -5]), ModInt1000000007::new(-3));
+    }
+
+    #[test]
+    fn static_modint_product() {
+        fn product(values: impl AsRef<[i32]>) -> ModInt1000000007 {
+            values
+                .as_ref()
+                .iter()
+                .copied()
+                .map(ModInt1000000007::new)
+                .product()
+        }
+
+        assert_eq!(product([-1, 2, -3, 4, -5]), ModInt1000000007::new(-120));
     }
 }
