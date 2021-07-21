@@ -60,9 +60,7 @@ mod tests {
 
     #[test]
     fn static_modint_new() {
-        use crate::modint_base::RemEuclidU32;
-
-        fn f<V: RemEuclidU32>(value: V) -> u32 {
+        fn f<V: crate::modint_base::RemEuclidU32>(value: V) -> u32 {
             ModInt1000000007::new(value).value()
         }
 
