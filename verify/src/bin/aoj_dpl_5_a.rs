@@ -9,10 +9,10 @@ type ModInt = ModInt1000000007;
 fn main() {
     input! {
         n: u32,
-        k: u32,
+        k: ModInt,
     }
 
-    let ans = ModInt::new(k).pow(n.into());
+    let ans = k.pow(n.into());
 
     println!("{}", ans);
 }
