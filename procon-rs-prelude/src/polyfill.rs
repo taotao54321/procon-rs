@@ -1,4 +1,4 @@
-/// Rust 1.52 で導入されたものと同じ。
+/// https://doc.rust-lang.org/std/primitive.slice.html#method.partition_point
 pub trait PartitionPointExt {
     type Item;
 

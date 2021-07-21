@@ -1,4 +1,4 @@
 mod macros;
-mod slice;
+mod polyfill;
 
-pub use slice::*;
+pub use polyfill::*;
