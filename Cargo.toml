@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "procon-rs-modint",
+    "procon-rs-modint-math",
     "procon-rs-prelude",
     "procon-rs-union-find",
     "verify",
