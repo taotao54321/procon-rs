@@ -6,3 +6,6 @@ edition = "2018"
 
 [dependencies]
 num-traits = "=0.2.11"
+
+[dev-dependencies]
+serial_test = "0.5.1"
