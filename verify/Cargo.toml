@@ -7,7 +7,7 @@ edition = "2018"
 [dependencies]
 proconio = { version = "=0.3.6", features = ["derive"] }
 
-procon-rs-prelude = { path = "../procon-rs-prelude" }
-procon-rs-union-find = { path = "../procon-rs-union-find" }
-procon-rs-modint = { path = "../procon-rs-modint" }
-procon-rs-modint-math = { path = "../procon-rs-modint-math" }
+taocp-prelude = { path = "../taocp-prelude" }
+taocp-union-find = { path = "../taocp-union-find" }
+taocp-modint = { path = "../taocp-modint" }
+taocp-modint-math = { path = "../taocp-modint-math" }

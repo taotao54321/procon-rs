@@ -1,9 +1,9 @@
 [workspace]
 members = [
-    "procon-rs-modint",
-    "procon-rs-modint-math",
-    "procon-rs-num-int",
-    "procon-rs-prelude",
-    "procon-rs-union-find",
+    "taocp-modint",
+    "taocp-modint-math",
+    "taocp-num-int",
+    "taocp-prelude",
+    "taocp-union-find",
     "verify",
 ]

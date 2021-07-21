@@ -1,4 +1,4 @@
-use procon_rs_modint::ModIntBase;
+use taocp_modint::ModIntBase;
 
 /// 法: 任意
 /// 計算量: O(n)
@@ -223,7 +223,7 @@ impl<Z: ModIntBase> Default for BinomialTable<Z> {
 mod tests {
     use super::*;
 
-    type ModInt = procon_rs_modint::ModInt1000000007;
+    type ModInt = taocp_modint::ModInt1000000007;
 
     #[test]
     fn test_factorial() {

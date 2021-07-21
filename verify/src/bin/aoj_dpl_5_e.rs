@@ -2,8 +2,8 @@
 
 use proconio::input;
 
-use procon_rs_modint::*;
-use procon_rs_modint_math::*;
+use taocp_modint::*;
+use taocp_modint_math::*;
 
 type ModInt = ModInt1000000007;
 

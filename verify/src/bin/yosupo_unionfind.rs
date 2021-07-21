@@ -2,7 +2,7 @@
 
 use proconio::input;
 
-use procon_rs_union_find::*;
+use taocp_union_find::*;
 
 fn main() {
     input! {

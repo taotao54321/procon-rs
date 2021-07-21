@@ -1,5 +1,5 @@
 [package]
-name = "procon-rs-num-int"
+name = "taocp-num-int"
 version = "0.1.0"
 authors = ["taotao54321 <taotao54321@gmail.com>"]
 edition = "2018"

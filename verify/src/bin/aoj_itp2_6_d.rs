@@ -2,7 +2,7 @@
 
 use proconio::input;
 
-use procon_rs_prelude::*;
+use taocp_prelude::*;
 
 fn main() {
     input! {

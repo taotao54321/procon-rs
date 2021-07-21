@@ -1,8 +1,7 @@
 [package]
-name = "procon-rs-modint-math"
+name = "taocp-prelude"
 version = "0.1.0"
 authors = ["taotao54321 <taotao54321@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-procon-rs-modint = { path = "../procon-rs-modint" }

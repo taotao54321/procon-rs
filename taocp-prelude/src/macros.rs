@@ -25,7 +25,7 @@ macro_rules! chmax {
 /// 多次元 Vec を作る。
 ///
 /// ```
-/// # use procon_rs_prelude::ndvec;
+/// # use taocp_prelude::ndvec;
 /// let dp = ndvec![0; 2, 3, 4];
 /// assert_eq!(dp, vec![vec![vec![0; 4]; 3]; 2]);
 /// ```

@@ -1,5 +1,5 @@
 [package]
-name = "procon-rs-union-find"
+name = "taocp-union-find"
 version = "0.1.0"
 authors = ["taotao54321 <taotao54321@gmail.com>"]
 edition = "2018"
