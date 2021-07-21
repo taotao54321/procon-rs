@@ -348,19 +348,5 @@ macro_rules! impl_num_traits {
                 self.value() == 1
             }
         }
-
-        impl<$($param: $bound),*> ::num_traits::Pow<u64> for $modint {
-            type Output = $modint;
-            fn pow(self, rhs: u64) -> Self::Output {
-                $crate::modint_base::ModIntBase::pow(self, rhs)
-            }
-        }
-
-        impl<$($param: $bound),*> ::num_traits::Inv for $modint {
-            type Output = $modint;
-            fn inv(self) -> Self::Output {
-                $crate::modint_base::ModIntBase::inv(self)
-            }
-        }
     };
 }

@@ -18,19 +18,89 @@ pub trait ModIntBase:
     + std::str::FromStr
     + std::fmt::Debug
     + std::fmt::Display
-    + std::ops::Neg
-    + std::ops::Add<Self>
-    + std::ops::Sub<Self>
-    + std::ops::Mul<Self>
+    + std::ops::Neg<Output = Self>
+    + std::ops::Add<Self, Output = Self>
+    + std::ops::Add<i8, Output = Self>
+    + std::ops::Add<i16, Output = Self>
+    + std::ops::Add<i32, Output = Self>
+    + std::ops::Add<i64, Output = Self>
+    + std::ops::Add<i128, Output = Self>
+    + std::ops::Add<isize, Output = Self>
+    + std::ops::Add<u8, Output = Self>
+    + std::ops::Add<u16, Output = Self>
+    + std::ops::Add<u32, Output = Self>
+    + std::ops::Add<u64, Output = Self>
+    + std::ops::Add<u128, Output = Self>
+    + std::ops::Add<usize, Output = Self>
+    + std::ops::Sub<Self, Output = Self>
+    + std::ops::Sub<i8, Output = Self>
+    + std::ops::Sub<i16, Output = Self>
+    + std::ops::Sub<i32, Output = Self>
+    + std::ops::Sub<i64, Output = Self>
+    + std::ops::Sub<i128, Output = Self>
+    + std::ops::Sub<isize, Output = Self>
+    + std::ops::Sub<u8, Output = Self>
+    + std::ops::Sub<u16, Output = Self>
+    + std::ops::Sub<u32, Output = Self>
+    + std::ops::Sub<u64, Output = Self>
+    + std::ops::Sub<u128, Output = Self>
+    + std::ops::Sub<usize, Output = Self>
+    + std::ops::Mul<Self, Output = Self>
+    + std::ops::Mul<i8, Output = Self>
+    + std::ops::Mul<i16, Output = Self>
+    + std::ops::Mul<i32, Output = Self>
+    + std::ops::Mul<i64, Output = Self>
+    + std::ops::Mul<i128, Output = Self>
+    + std::ops::Mul<isize, Output = Self>
+    + std::ops::Mul<u8, Output = Self>
+    + std::ops::Mul<u16, Output = Self>
+    + std::ops::Mul<u32, Output = Self>
+    + std::ops::Mul<u64, Output = Self>
+    + std::ops::Mul<u128, Output = Self>
+    + std::ops::Mul<usize, Output = Self>
     + std::ops::AddAssign<Self>
+    + std::ops::AddAssign<i8>
+    + std::ops::AddAssign<i16>
+    + std::ops::AddAssign<i32>
+    + std::ops::AddAssign<i64>
+    + std::ops::AddAssign<i128>
+    + std::ops::AddAssign<isize>
+    + std::ops::AddAssign<u8>
+    + std::ops::AddAssign<u16>
+    + std::ops::AddAssign<u32>
+    + std::ops::AddAssign<u64>
+    + std::ops::AddAssign<u128>
+    + std::ops::AddAssign<usize>
     + std::ops::SubAssign<Self>
+    + std::ops::SubAssign<i8>
+    + std::ops::SubAssign<i16>
+    + std::ops::SubAssign<i32>
+    + std::ops::SubAssign<i64>
+    + std::ops::SubAssign<i128>
+    + std::ops::SubAssign<isize>
+    + std::ops::SubAssign<u8>
+    + std::ops::SubAssign<u16>
+    + std::ops::SubAssign<u32>
+    + std::ops::SubAssign<u64>
+    + std::ops::SubAssign<u128>
+    + std::ops::SubAssign<usize>
     + std::ops::MulAssign<Self>
+    + std::ops::MulAssign<i8>
+    + std::ops::MulAssign<i16>
+    + std::ops::MulAssign<i32>
+    + std::ops::MulAssign<i64>
+    + std::ops::MulAssign<i128>
+    + std::ops::MulAssign<isize>
+    + std::ops::MulAssign<u8>
+    + std::ops::MulAssign<u16>
+    + std::ops::MulAssign<u32>
+    + std::ops::MulAssign<u64>
+    + std::ops::MulAssign<u128>
+    + std::ops::MulAssign<usize>
     + std::iter::Sum
     + std::iter::Product
     + num_traits::Zero
     + num_traits::One
-    + num_traits::Pow<u64>
-    + num_traits::Inv
 {
     fn modulus() -> u32;
 
