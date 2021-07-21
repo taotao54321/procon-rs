@@ -1,12 +1,26 @@
-use num_traits::PrimInt;
-
-/// floor((x+y)/2) を求める。オーバーフローしない。
-pub fn midpoint_floor<T>(x: T, y: T) -> T
-where
-    T: PrimInt,
-{
-    (x & y) + ((x ^ y) >> 1)
+/// とりあえず値型のみ受け入れる。
+/// 値と参照どちらもとれるのが理想だが実装できなかった。
+pub fn midpoint_floor<T: Midpoint>(x: T, y: T) -> T {
+    x.midpoint_floor(&y)
 }
+
+pub trait Midpoint {
+    fn midpoint_floor(&self, other: &Self) -> Self;
+}
+
+macro_rules! impl_midpoint_for_prims {
+    ($($ty:ty),*) => {
+        $(
+            impl Midpoint for $ty {
+                fn midpoint_floor(&self, other: &Self) -> Self {
+                    (self & other) + ((self ^ other) >> 1)
+                }
+            }
+        )*
+    };
+}
+
+impl_midpoint_for_prims!(i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize);
 
 #[cfg(test)]
 mod tests {

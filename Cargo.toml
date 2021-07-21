@@ -2,6 +2,7 @@
 members = [
     "procon-rs-modint",
     "procon-rs-modint-math",
+    "procon-rs-num-int",
     "procon-rs-prelude",
     "procon-rs-union-find",
     "verify",
