@@ -35,10 +35,7 @@ impl<M: DynamicModulus> ModIntBase for DynamicModInt<M> {
 
 impl<M: DynamicModulus> ModIntBaseImpl for DynamicModInt<M> {}
 
-impl_basic_traits!(<M: DynamicModulus>, DynamicModInt<M>);
-impl_ops!(<M: DynamicModulus>, DynamicModInt<M>);
-impl_iter_traits!(<M: DynamicModulus>, DynamicModInt<M>);
-impl_num_traits!(<M: DynamicModulus>, DynamicModInt<M>);
+impl_traits!(<M: DynamicModulus>, DynamicModInt<M>);
 
 pub trait DynamicModulus: 'static {
     fn value() -> &'static DynamicModulusValue;

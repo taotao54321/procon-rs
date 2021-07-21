@@ -350,3 +350,12 @@ macro_rules! impl_num_traits {
         }
     };
 }
+
+macro_rules! impl_traits {
+    (<$($param:ident : $bound:tt),*>, $modint:ty) => {
+        impl_basic_traits!(<$($param: $bound),*>, $modint);
+        impl_ops!(<$($param: $bound),*>, $modint);
+        impl_iter_traits!(<$($param: $bound),*>, $modint);
+        impl_num_traits!(<$($param: $bound),*>, $modint);
+    };
+}

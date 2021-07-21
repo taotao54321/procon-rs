@@ -30,10 +30,7 @@ impl<M: StaticModulus> ModIntBase for StaticModInt<M> {
 
 impl<M: StaticModulus> ModIntBaseImpl for StaticModInt<M> {}
 
-impl_basic_traits!(<M: StaticModulus>, StaticModInt<M>);
-impl_ops!(<M: StaticModulus>, StaticModInt<M>);
-impl_iter_traits!(<M: StaticModulus>, StaticModInt<M>);
-impl_num_traits!(<M: StaticModulus>, StaticModInt<M>);
+impl_traits!(<M: StaticModulus>, StaticModInt<M>);
 
 pub trait StaticModulus: 'static {
     const VALUE: u32;
