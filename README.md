@@ -7,4 +7,6 @@
 * 0 の 0 乗は 1。
 * assert は可能な限り入れる。これによる若干の速度低下は許容する。
 
+## License
 
+[CC0](https://creativecommons.org/publicdomain/zero/1.0/)
