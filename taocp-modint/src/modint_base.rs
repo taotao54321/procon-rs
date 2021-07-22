@@ -113,7 +113,6 @@ pub trait ModIntBase:
 
     fn value(self) -> u32;
 
-    /// 0^0 は 1 を返す。
     fn pow(self, mut e: u64) -> Self {
         let mut res = Self::new_unchecked(1);
 
@@ -132,8 +131,7 @@ pub trait ModIntBase:
         res
     }
 
-    /// self.value() == 0 の場合、panic する。
-    /// gcd(self.value(), Self::modulus()) != 1 の場合、panic する。
+    /// self.value() != 0 かつ gcd(self.value(), Self::modulus()) == 1 でなければならない。
     fn inv(self) -> Self {
         fn extgcd(a: i32, b: i32) -> (i32, i32) {
             if b == 0 {
