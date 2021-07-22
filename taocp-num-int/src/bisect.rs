@@ -1,5 +1,3 @@
-use num_traits::One;
-
 use crate::midpoint::Midpoint;
 
 /// lo..hi で定義された広義単調減少する述語関数 pred に対し、pred(x) が偽となる最小の x を返す。
@@ -8,7 +6,7 @@ use crate::midpoint::Midpoint;
 /// lo > hi であってはならない。
 pub fn bisect<T, P>(mut lo: T, mut hi: T, mut pred: P) -> T
 where
-    T: Ord + std::ops::Add<T, Output = T> + One + Midpoint,
+    T: Ord + std::ops::Add<T, Output = T> + num_traits::One + Midpoint,
     P: FnMut(&T) -> bool,
 {
     assert!(lo <= hi);
