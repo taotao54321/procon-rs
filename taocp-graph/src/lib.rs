@@ -1,7 +1,5 @@
 //! 重み付き単純グラフに限定する。
 
-pub mod sssp;
-
 // TODO: 宣言と impl で同じトレイト境界を 2 回書くのをどうにかしたい
 pub trait WeightBase:
     Sized

@@ -1,15 +1,15 @@
 use std::collections::BinaryHeap;
 
-use crate::{GraphBase, WeightBase};
+use taocp_graph::{GraphBase, WeightBase};
 
 #[derive(Debug)]
-pub struct Dijkstra<W> {
+pub struct SsspDijkstra<W> {
     start: usize,
     ds: Vec<W>,
     ps: Vec<usize>,
 }
 
-impl<W: WeightBase> Dijkstra<W> {
+impl<W: WeightBase> SsspDijkstra<W> {
     pub fn distance_to(&self, dst: usize) -> Option<W> {
         if self.ds[dst] == Self::inf() {
             return None;
@@ -39,7 +39,7 @@ impl<W: WeightBase> Dijkstra<W> {
     }
 
     fn new(n: usize, start: usize) -> Self {
-        Self {
+        SsspDijkstra {
             start,
             ds: vec![Self::inf(); n],
             ps: vec![usize::max_value(); n],
@@ -58,14 +58,14 @@ impl<W: WeightBase> Dijkstra<W> {
 }
 
 /// g は負辺を持ってはならない。
-pub fn dijkstra<G, W>(g: &G, start: usize) -> Dijkstra<W>
+pub fn sssp_dijkstra<G, W>(g: &G, start: usize) -> SsspDijkstra<W>
 where
     G: GraphBase<Weight = W>,
     W: WeightBase,
 {
     let n = g.node_count();
 
-    let mut state = Dijkstra::new(n, start);
+    let mut state = SsspDijkstra::new(n, start);
     let mut heap = BinaryHeap::new();
 
     macro_rules! relax {
@@ -125,22 +125,22 @@ impl<W: WeightBase> PartialOrd for HeapEntry<W> {
 
 #[cfg(test)]
 mod tests {
-    use crate::GraphVV;
+    use taocp_graph::GraphVV;
 
     use super::*;
 
     #[test]
-    fn test_dijkstra() {
+    fn test_sssp_dijkstra() {
         // TODO: グラフ読み込み関数があるとわかりやすく書ける
         {
             let g = GraphVV::<u32>::new(1);
-            let res = dijkstra(&g, 0);
+            let res = sssp_dijkstra(&g, 0);
             assert_eq!(res.distance_to(0), Some(0));
             assert_eq!(res.path_to(0), Some(vec![0]));
         }
         {
             let g = GraphVV::<u32>::new(2);
-            let res = dijkstra(&g, 0);
+            let res = sssp_dijkstra(&g, 0);
             assert_eq!(res.distance_to(0), Some(0));
             assert_eq!(res.distance_to(1), None);
             assert_eq!(res.path_to(0), Some(vec![0]));

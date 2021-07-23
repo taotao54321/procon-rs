@@ -2,6 +2,7 @@
 members = [
     "taocp-bit",
     "taocp-graph",
+    "taocp-graph-sssp",
     "taocp-modint",
     "taocp-modint-math",
     "taocp-num-int",

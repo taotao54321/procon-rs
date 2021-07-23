@@ -3,6 +3,7 @@
 use proconio::input;
 
 use taocp_graph::*;
+use taocp_graph_sssp::*;
 
 fn main() {
     input! {
@@ -22,7 +23,7 @@ fn main() {
         g.add_edge(src, GraphEdge::new(dst, weight));
     }
 
-    let res = sssp::dijkstra(&g, start);
+    let res = sssp_dijkstra(&g, start);
 
     if let Some(path) = res.path_to(goal) {
         println!("{} {}", res.distance_to(goal).unwrap(), path.len() - 1);
