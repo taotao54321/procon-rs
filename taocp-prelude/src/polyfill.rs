@@ -32,6 +32,30 @@ impl<T> PartitionPointExt for [T] {
     }
 }
 
+/// https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.reduce
+pub trait ReduceExt {
+    type Item;
+
+    fn reduce<F>(self, f: F) -> Option<Self::Item>
+    where
+        F: FnMut(Self::Item, Self::Item) -> Self::Item;
+}
+
+impl<T> ReduceExt for T
+where
+    T: Iterator,
+{
+    type Item = T::Item;
+
+    fn reduce<F>(mut self, f: F) -> Option<Self::Item>
+    where
+        F: FnMut(Self::Item, Self::Item) -> Self::Item,
+    {
+        let ini = self.next()?;
+        Some(self.fold(ini, f))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -42,5 +66,12 @@ mod tests {
 
         assert_eq!(xs.partition_point(|&x| x < 4), 4);
         assert_eq!(xs.partition_point(|&x| x <= 4), 5);
+    }
+
+    #[test]
+    fn reduce_ext() {
+        assert_eq!((0..0).reduce(std::ops::Add::add), None);
+        assert_eq!((0..=0).reduce(std::ops::Add::add), Some(0));
+        assert_eq!((1..=10).reduce(std::ops::Add::add), Some(55));
     }
 }
