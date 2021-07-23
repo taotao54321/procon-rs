@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "taocp-bit",
+    "taocp-graph",
     "taocp-modint",
     "taocp-modint-math",
     "taocp-num-int",

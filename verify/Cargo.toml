@@ -8,6 +8,7 @@ edition = "2018"
 proconio = { version = "=0.3.6", features = ["derive"] }
 
 taocp-bit = { path = "../taocp-bit" }
+taocp-graph = { path = "../taocp-graph" }
 taocp-modint = { path = "../taocp-modint" }
 taocp-modint-math = { path = "../taocp-modint-math" }
 taocp-num-int = { path = "../taocp-num-int" }
