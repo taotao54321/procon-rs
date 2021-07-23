@@ -1,0 +1,57 @@
+fail_fast: true
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+      - id: check-merge-conflict
+      - id: check-vcs-permalinks
+      - id: check-yaml
+      - id: detect-aws-credentials
+        args: [--allow-missing-credentials]
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+      - id: mixed-line-ending
+        args: [--fix=no]
+      - id: trailing-whitespace
+
+  - repo: https://github.com/DevinR528/cargo-sort
+    rev: v1.0.5
+    hooks:
+      - id: cargo-sort
+
+  - repo: meta
+    hooks:
+      - id: check-hooks-apply
+      - id: check-useless-excludes
+
+  - repo: local
+    hooks:
+      - id: cargo-fmt
+        name: cargo-fmt
+        language: system
+        types: [file, rust]
+        entry: cargo fmt -- --check
+        pass_filenames: false
+
+      - id: cargo-clippy
+        name: cargo-clippy
+        language: system
+        types: [file, rust]
+        entry: cargo clippy --workspace --bins --tests --examples --
+        pass_filenames: false
+
+      - id: cargo-test
+        name: cargo-test
+        language: system
+        types: [file, rust]
+        entry: cargo test --
+        pass_filenames: false
+
+      - id: oj-verify
+        name: oj-verify
+        language: system
+        types: [file, rust]
+        entry: oj-verify run
+        pass_filenames: false
