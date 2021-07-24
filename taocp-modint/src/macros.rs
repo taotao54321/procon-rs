@@ -43,13 +43,13 @@ macro_rules! impl_basic_traits {
         }
 
         impl<$($param: $bound),*> ::std::fmt::Debug for $modint {
-            fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::result::Result<(), ::std::fmt::Error> {
+            fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
                 ::std::fmt::Debug::fmt(&self.value(), f)
             }
         }
 
         impl<$($param: $bound),*> ::std::fmt::Display for $modint {
-            fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::result::Result<(), ::std::fmt::Error> {
+            fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
                 ::std::fmt::Display::fmt(&self.value(), f)
             }
         }
