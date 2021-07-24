@@ -39,7 +39,7 @@ impl<W: WeightBase> SsspDijkstra<W> {
     }
 
     fn new(n: usize, start: usize) -> Self {
-        SsspDijkstra {
+        Self {
             start,
             ds: vec![Self::inf(); n],
             ps: vec![usize::max_value(); n],
