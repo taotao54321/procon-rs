@@ -172,7 +172,7 @@ mod tests {
 
     #[test]
     fn test_bit_new_single() {
-        assert_eq!(u32::bit_new_single(0), 1 << 0);
+        assert_eq!(u32::bit_new_single(0), 1);
         assert_eq!(u32::bit_new_single(1), 1 << 1);
         assert_eq!(u32::bit_new_single(2), 1 << 2);
         assert_eq!(u32::bit_new_single(10), 1 << 10);
@@ -233,9 +233,9 @@ mod tests {
 
     #[test]
     fn test_bit_positions_one() {
-        let x = 0b101101_u32;
+        let x: u32 = 0b11001;
 
-        assert_equal(bit_positions_one(x), vec![0, 2, 3, 5]);
+        assert_equal(bit_positions_one(x), vec![0, 3, 4]);
     }
 
     #[test]

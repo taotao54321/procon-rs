@@ -776,19 +776,22 @@ mod tests {
         assert_eq!(OrdFloat::nan() + OrdFloat(1.), OrdFloat::nan());
         assert_eq!(OrdFloat::<f32>::nan() + OrdFloat::nan(), OrdFloat::nan());
 
-        assert_eq!(OrdFloat(1.) + OrdFloat(2.), OrdFloat(1.) + &OrdFloat(2.));
-        assert_eq!(OrdFloat(1.) + OrdFloat(2.), &OrdFloat(1.) + OrdFloat(2.));
-        assert_eq!(OrdFloat(1.) + OrdFloat(2.), &OrdFloat(1.) + &OrdFloat(2.));
+        #[allow(clippy::op_ref)]
+        {
+            assert_eq!(OrdFloat(1.) + OrdFloat(2.), OrdFloat(1.) + &OrdFloat(2.));
+            assert_eq!(OrdFloat(1.) + OrdFloat(2.), &OrdFloat(1.) + OrdFloat(2.));
+            assert_eq!(OrdFloat(1.) + OrdFloat(2.), &OrdFloat(1.) + &OrdFloat(2.));
 
-        assert_eq!(OrdFloat(1.) + OrdFloat(2.), OrdFloat(1.) + 2.);
-        assert_eq!(OrdFloat(1.) + OrdFloat(2.), OrdFloat(1.) + &2.);
-        assert_eq!(OrdFloat(1.) + OrdFloat(2.), &OrdFloat(1.) + 2.);
-        assert_eq!(OrdFloat(1.) + OrdFloat(2.), &OrdFloat(1.) + &2.);
+            assert_eq!(OrdFloat(1.) + OrdFloat(2.), OrdFloat(1.) + 2.);
+            assert_eq!(OrdFloat(1.) + OrdFloat(2.), OrdFloat(1.) + &2.);
+            assert_eq!(OrdFloat(1.) + OrdFloat(2.), &OrdFloat(1.) + 2.);
+            assert_eq!(OrdFloat(1.) + OrdFloat(2.), &OrdFloat(1.) + &2.);
 
-        assert_eq!(OrdFloat(1.) + OrdFloat(2.), 1. + OrdFloat(2.));
-        assert_eq!(OrdFloat(1.) + OrdFloat(2.), 1. + &OrdFloat(2.));
-        assert_eq!(OrdFloat(1.) + OrdFloat(2.), &1. + OrdFloat(2.));
-        assert_eq!(OrdFloat(1.) + OrdFloat(2.), &1. + &OrdFloat(2.));
+            assert_eq!(OrdFloat(1.) + OrdFloat(2.), 1. + OrdFloat(2.));
+            assert_eq!(OrdFloat(1.) + OrdFloat(2.), 1. + &OrdFloat(2.));
+            assert_eq!(OrdFloat(1.) + OrdFloat(2.), &1. + OrdFloat(2.));
+            assert_eq!(OrdFloat(1.) + OrdFloat(2.), &1. + &OrdFloat(2.));
+        }
     }
 
     #[test]

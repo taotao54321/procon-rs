@@ -215,7 +215,7 @@ mod tests {
         assert_eq!((1_i64 << 62).sqrt_floor(), 1 << 31);
         assert_eq!(((1_i64 << 62) + 1).sqrt_floor(), 1 << 31);
 
-        assert_eq!(i64::max_value().sqrt_floor(), 3037000499);
+        assert_eq!(i64::max_value().sqrt_floor(), 3_037_000_499);
     }
 
     #[test]
@@ -228,7 +228,7 @@ mod tests {
         assert_eq!((1_i64 << 62).sqrt_ceil(), 1 << 31);
         assert_eq!(((1_i64 << 62) + 1).sqrt_ceil(), (1 << 31) + 1);
 
-        assert_eq!(i64::max_value().sqrt_ceil(), 3037000500);
+        assert_eq!(i64::max_value().sqrt_ceil(), 3_037_000_500);
     }
 
     #[test]
@@ -241,7 +241,7 @@ mod tests {
         assert_eq!((1_u64 << 62).sqrt_floor(), 1 << 31);
         assert_eq!(((1_u64 << 62) + 1).sqrt_floor(), 1 << 31);
 
-        assert_eq!(u64::max_value().sqrt_floor(), 4294967295);
+        assert_eq!(u64::max_value().sqrt_floor(), 4_294_967_295);
     }
 
     #[test]
@@ -254,6 +254,6 @@ mod tests {
         assert_eq!((1_u64 << 62).sqrt_ceil(), 1 << 31);
         assert_eq!(((1_u64 << 62) + 1).sqrt_ceil(), (1 << 31) + 1);
 
-        assert_eq!(u64::max_value().sqrt_ceil(), 4294967296);
+        assert_eq!(u64::max_value().sqrt_ceil(), 4_294_967_296);
     }
 }

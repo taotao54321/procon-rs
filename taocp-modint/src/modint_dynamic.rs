@@ -307,47 +307,50 @@ mod tests {
             ModInt::new(value)
         }
 
-        assert_eq!(f(1) + f(1), f(1) + &f(1));
-        assert_eq!(f(1) + f(1), &f(1) + f(1));
-        assert_eq!(f(1) + f(1), &f(1) + &f(1));
+        #[allow(clippy::op_ref)]
+        {
+            assert_eq!(f(2) + f(2), f(2) + &f(2));
+            assert_eq!(f(2) + f(2), &f(2) + f(2));
+            assert_eq!(f(2) + f(2), &f(2) + &f(2));
 
-        assert_eq!(f(1) + f(1), f(1) + 1);
-        assert_eq!(f(1) + f(1), f(1) + &1);
-        assert_eq!(f(1) + f(1), &f(1) + 1);
-        assert_eq!(f(1) + f(1), &f(1) + &1);
+            assert_eq!(f(2) + f(2), f(2) + 2);
+            assert_eq!(f(2) + f(2), f(2) + &2);
+            assert_eq!(f(2) + f(2), &f(2) + 2);
+            assert_eq!(f(2) + f(2), &f(2) + &2);
 
-        assert_eq!(f(1) + f(1), 1 + f(1));
-        assert_eq!(f(1) + f(1), 1 + &f(1));
-        assert_eq!(f(1) + f(1), &1 + f(1));
-        assert_eq!(f(1) + f(1), &1 + &f(1));
+            assert_eq!(f(2) + f(2), 2 + f(2));
+            assert_eq!(f(2) + f(2), 2 + &f(2));
+            assert_eq!(f(2) + f(2), &2 + f(2));
+            assert_eq!(f(2) + f(2), &2 + &f(2));
 
-        assert_eq!(f(1) - f(1), f(1) - &f(1));
-        assert_eq!(f(1) - f(1), &f(1) - f(1));
-        assert_eq!(f(1) - f(1), &f(1) - &f(1));
+            assert_eq!(f(2) - f(2), f(2) - &f(2));
+            assert_eq!(f(2) - f(2), &f(2) - f(2));
+            assert_eq!(f(2) - f(2), &f(2) - &f(2));
 
-        assert_eq!(f(1) - f(1), f(1) - 1);
-        assert_eq!(f(1) - f(1), f(1) - &1);
-        assert_eq!(f(1) - f(1), &f(1) - 1);
-        assert_eq!(f(1) - f(1), &f(1) - &1);
+            assert_eq!(f(2) - f(2), f(2) - 2);
+            assert_eq!(f(2) - f(2), f(2) - &2);
+            assert_eq!(f(2) - f(2), &f(2) - 2);
+            assert_eq!(f(2) - f(2), &f(2) - &2);
 
-        assert_eq!(f(1) - f(1), 1 - f(1));
-        assert_eq!(f(1) - f(1), 1 - &f(1));
-        assert_eq!(f(1) - f(1), &1 - f(1));
-        assert_eq!(f(1) - f(1), &1 - &f(1));
+            assert_eq!(f(2) - f(2), 2 - f(2));
+            assert_eq!(f(2) - f(2), 2 - &f(2));
+            assert_eq!(f(2) - f(2), &2 - f(2));
+            assert_eq!(f(2) - f(2), &2 - &f(2));
 
-        assert_eq!(f(1) * f(1), f(1) * &f(1));
-        assert_eq!(f(1) * f(1), &f(1) * f(1));
-        assert_eq!(f(1) * f(1), &f(1) * &f(1));
+            assert_eq!(f(2) * f(2), f(2) * &f(2));
+            assert_eq!(f(2) * f(2), &f(2) * f(2));
+            assert_eq!(f(2) * f(2), &f(2) * &f(2));
 
-        assert_eq!(f(1) * f(1), f(1) * 1);
-        assert_eq!(f(1) * f(1), f(1) * &1);
-        assert_eq!(f(1) * f(1), &f(1) * 1);
-        assert_eq!(f(1) * f(1), &f(1) * &1);
+            assert_eq!(f(2) * f(2), f(2) * 2);
+            assert_eq!(f(2) * f(2), f(2) * &2);
+            assert_eq!(f(2) * f(2), &f(2) * 2);
+            assert_eq!(f(2) * f(2), &f(2) * &2);
 
-        assert_eq!(f(1) * f(1), 1 * f(1));
-        assert_eq!(f(1) * f(1), 1 * &f(1));
-        assert_eq!(f(1) * f(1), &1 * f(1));
-        assert_eq!(f(1) * f(1), &1 * &f(1));
+            assert_eq!(f(2) * f(2), 2 * f(2));
+            assert_eq!(f(2) * f(2), 2 * &f(2));
+            assert_eq!(f(2) * f(2), &2 * f(2));
+            assert_eq!(f(2) * f(2), &2 * &f(2));
+        }
     }
 
     #[test]
