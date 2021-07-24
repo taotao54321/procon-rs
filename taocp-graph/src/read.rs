@@ -16,7 +16,7 @@ impl<W: WeightBase> Readable for GraphEdgeSrcDst<W> {
     fn read<R: BufRead, S: Source<R>>(source: &mut S) -> Self::Output {
         let src = usize::read(source);
         let dst = usize::read(source);
-        GraphEdge::new(src, dst, W::one())
+        GraphEdge::new_unweighted(src, dst)
     }
 }
 
@@ -28,7 +28,7 @@ impl<W: WeightBase> Readable for GraphEdgeSrcDst1<W> {
     fn read<R: BufRead, S: Source<R>>(source: &mut S) -> Self::Output {
         let src = usize::read(source) - 1;
         let dst = usize::read(source) - 1;
-        GraphEdge::new(src, dst, W::one())
+        GraphEdge::new_unweighted(src, dst)
     }
 }
 

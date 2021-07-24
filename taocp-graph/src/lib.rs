@@ -1,8 +1,10 @@
 //! 重み付き単純グラフに限定する。
 
-mod io;
+mod dump;
+mod read;
 
-pub use io::*;
+pub use dump::*;
+pub use read::*;
 
 // TODO: 宣言と impl で同じトレイト境界を 2 回書くのをどうにかしたい
 pub trait WeightBase:
@@ -54,7 +56,11 @@ pub struct GraphEdge<W> {
 
 impl<W: WeightBase> GraphEdge<W> {
     pub fn new(src: usize, dst: usize, weight: W) -> Self {
-        GraphEdge { src, dst, weight }
+        Self { src, dst, weight }
+    }
+
+    pub fn new_unweighted(src: usize, dst: usize) -> Self {
+        Self::new(src, dst, W::one())
     }
 
     pub fn src(self) -> usize {
