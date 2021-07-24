@@ -6,6 +6,7 @@ edition = "2018"
 
 [dependencies]
 num-traits = "=0.2.11"
+proconio = "=0.3.6"
 
 [dev-dependencies]
 itertools = "=0.9.0"

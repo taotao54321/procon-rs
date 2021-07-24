@@ -1,5 +1,9 @@
 //! 重み付き単純グラフに限定する。
 
+mod io;
+
+pub use io::*;
+
 // TODO: 宣言と impl で同じトレイト境界を 2 回書くのをどうにかしたい
 pub trait WeightBase:
     Sized
@@ -43,13 +47,18 @@ impl<T> WeightBase for T where
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct GraphEdge<W> {
+    src: usize,
     dst: usize,
     weight: W,
 }
 
 impl<W: WeightBase> GraphEdge<W> {
-    pub fn new(dst: usize, weight: W) -> Self {
-        GraphEdge { dst, weight }
+    pub fn new(src: usize, dst: usize, weight: W) -> Self {
+        GraphEdge { src, dst, weight }
+    }
+
+    pub fn src(self) -> usize {
+        self.src
     }
 
     pub fn dst(self) -> usize {
@@ -59,22 +68,28 @@ impl<W: WeightBase> GraphEdge<W> {
     pub fn weight(self) -> W {
         self.weight
     }
+
+    pub fn reversed(self) -> Self {
+        Self::new(self.dst, self.src, self.weight)
+    }
 }
 
 pub trait GraphBase {
     type Weight;
 
     fn node_count(&self) -> usize;
+
+    /// 片方向の辺の数を返す。無向グラフの場合、2*(無向辺の数) が返ることになる。
     fn edge_count(&self) -> usize;
 
-    fn edges_from(&self, src: usize) -> Box<dyn Iterator<Item = GraphEdge<Self::Weight>> + '_>;
+    fn neighbors(&self, src: usize) -> Box<dyn Iterator<Item = (usize, Self::Weight)> + '_>;
 
     fn weight_of(&self, src: usize, dst: usize) -> Option<Self::Weight>;
 }
 
 #[derive(Clone, Debug)]
 pub struct GraphVV<W> {
-    inner: Vec<Vec<GraphEdge<W>>>,
+    inner: Vec<Vec<(usize, W)>>,
 }
 
 impl<W: WeightBase> GraphVV<W> {
@@ -84,9 +99,31 @@ impl<W: WeightBase> GraphVV<W> {
         }
     }
 
+    pub fn from_edges(n: usize, edges: &[GraphEdge<W>]) -> Self {
+        let mut this = Self::new(n);
+        edges.iter().for_each(|&e| this.add_edge(e));
+        this
+    }
+
+    pub fn from_edges_bidi(n: usize, edges: &[GraphEdge<W>]) -> Self {
+        let mut this = Self::new(n);
+        edges.iter().for_each(|&e| this.add_edge_bidi(e));
+        this
+    }
+
+    /// 片方向の辺を追加する。
     /// 単純性を崩してはならない。
-    pub fn add_edge(&mut self, src: usize, edge: GraphEdge<W>) {
-        self.inner[src].push(edge);
+    pub fn add_edge(&mut self, edge: GraphEdge<W>) {
+        let GraphEdge { src, dst, weight } = edge;
+
+        self.inner[src].push((dst, weight));
+    }
+
+    /// 双方向の辺を追加する。
+    /// 単純性を崩してはならない。
+    pub fn add_edge_bidi(&mut self, edge: GraphEdge<W>) {
+        self.add_edge(edge);
+        self.add_edge(edge.reversed());
     }
 }
 
@@ -101,15 +138,15 @@ impl<W: WeightBase> GraphBase for GraphVV<W> {
         self.inner.iter().map(|v| v.len()).sum()
     }
 
-    fn edges_from(&self, src: usize) -> Box<dyn Iterator<Item = GraphEdge<Self::Weight>> + '_> {
+    fn neighbors(&self, src: usize) -> Box<dyn Iterator<Item = (usize, Self::Weight)> + '_> {
         Box::new(self.inner[src].iter().copied())
     }
 
     fn weight_of(&self, src: usize, dst: usize) -> Option<Self::Weight> {
         self.inner[src]
             .iter()
-            .find(|e| e.dst == dst)
-            .map(|e| e.weight)
+            .find(|&&(e_dst, _)| e_dst == dst)
+            .map(|&(_, w)| w)
     }
 }
 
@@ -125,11 +162,33 @@ impl<W: WeightBase> GraphMat<W> {
         }
     }
 
-    /// 単純性を崩してはならない。
-    pub fn add_edge(&mut self, src: usize, edge: GraphEdge<W>) {
-        assert!(self.inner[src][edge.dst].is_none());
+    pub fn from_edges(n: usize, edges: &[GraphEdge<W>]) -> Self {
+        let mut this = Self::new(n);
+        edges.iter().for_each(|&e| this.add_edge(e));
+        this
+    }
 
-        self.inner[src][edge.dst] = Some(edge.weight);
+    pub fn from_edges_bidi(n: usize, edges: &[GraphEdge<W>]) -> Self {
+        let mut this = Self::new(n);
+        edges.iter().for_each(|&e| this.add_edge_bidi(e));
+        this
+    }
+
+    /// 片方向の辺を追加する。
+    /// 単純性を崩してはならない。
+    pub fn add_edge(&mut self, edge: GraphEdge<W>) {
+        let GraphEdge { src, dst, weight } = edge;
+
+        assert!(self.inner[src][dst].is_none());
+
+        self.inner[src][dst] = Some(weight);
+    }
+
+    /// 双方向の辺を追加する。
+    /// 単純性を崩してはならない。
+    pub fn add_edge_bidi(&mut self, edge: GraphEdge<W>) {
+        self.add_edge(edge);
+        self.add_edge(edge.reversed());
     }
 }
 
@@ -144,12 +203,12 @@ impl<W: WeightBase> GraphBase for GraphMat<W> {
         self.inner.iter().flatten().filter(|o| o.is_some()).count()
     }
 
-    fn edges_from(&self, src: usize) -> Box<dyn Iterator<Item = GraphEdge<Self::Weight>> + '_> {
+    fn neighbors(&self, src: usize) -> Box<dyn Iterator<Item = (usize, Self::Weight)> + '_> {
         Box::new(
             self.inner[src]
                 .iter()
                 .enumerate()
-                .filter_map(|(dst, o)| o.map(|w| GraphEdge::new(dst, w))),
+                .filter_map(|(dst, o)| o.map(|w| (dst, w))),
         )
     }
 
@@ -165,28 +224,42 @@ mod tests {
     use super::*;
 
     #[test]
-    fn graph_vv() {
-        let mut g = GraphVV::<i32>::new(4);
+    fn graph_vv_new() {
+        {
+            let g = GraphVV::<i32>::new(0);
+            assert_eq!(g.node_count(), 0);
+            assert_eq!(g.edge_count(), 0);
+        }
+        {
+            let g = GraphVV::<i32>::new(1);
+            assert_eq!(g.node_count(), 1);
+            assert_eq!(g.edge_count(), 0);
+        }
+        {
+            let g = GraphVV::<i32>::new(10);
+            assert_eq!(g.node_count(), 10);
+            assert_eq!(g.edge_count(), 0);
+        }
+    }
 
-        g.add_edge(0, GraphEdge::new(1, 10));
-        g.add_edge(0, GraphEdge::new(2, 20));
-        g.add_edge(1, GraphEdge::new(3, 30));
-        g.add_edge(3, GraphEdge::new(0, 40));
-        g.add_edge(3, GraphEdge::new(1, 50));
+    #[test]
+    fn graph_vv_from_edges() {
+        let edges = [
+            GraphEdge::new(0, 1, 10),
+            GraphEdge::new(0, 2, 20),
+            GraphEdge::new(1, 3, 30),
+            GraphEdge::new(3, 0, 40),
+            GraphEdge::new(3, 1, 50),
+        ];
+        let g = GraphVV::from_edges(4, &edges);
 
         assert_eq!(g.node_count(), 4);
         assert_eq!(g.edge_count(), 5);
 
-        assert_equal(
-            g.edges_from(0),
-            vec![GraphEdge::new(1, 10), GraphEdge::new(2, 20)],
-        );
-        assert_equal(g.edges_from(1), vec![GraphEdge::new(3, 30)]);
-        assert_eq!(g.edges_from(2).next(), None);
-        assert_equal(
-            g.edges_from(3),
-            vec![GraphEdge::new(0, 40), GraphEdge::new(1, 50)],
-        );
+        assert_equal(g.neighbors(0), vec![(1, 10), (2, 20)]);
+        assert_equal(g.neighbors(1), vec![(3, 30)]);
+        assert_equal(g.neighbors(2), vec![]);
+        assert_equal(g.neighbors(3), vec![(0, 40), (1, 50)]);
 
         assert_eq!(g.weight_of(0, 1), Some(10));
         assert_eq!(g.weight_of(3, 1), Some(50));
@@ -194,31 +267,91 @@ mod tests {
     }
 
     #[test]
-    fn graph_mat() {
-        let mut g = GraphMat::<i32>::new(4);
+    fn graph_vv_from_edges_bidi() {
+        let edges = [
+            GraphEdge::new(0, 1, 10),
+            GraphEdge::new(0, 2, 20),
+            GraphEdge::new(1, 3, 30),
+            GraphEdge::new(3, 0, 40),
+        ];
+        let g = GraphVV::from_edges_bidi(4, &edges);
 
-        g.add_edge(0, GraphEdge::new(1, 10));
-        g.add_edge(0, GraphEdge::new(2, 20));
-        g.add_edge(1, GraphEdge::new(3, 30));
-        g.add_edge(3, GraphEdge::new(0, 40));
-        g.add_edge(3, GraphEdge::new(1, 50));
+        assert_eq!(g.node_count(), 4);
+        assert_eq!(g.edge_count(), 8);
+
+        assert_equal(g.neighbors(0), vec![(1, 10), (2, 20), (3, 40)]);
+        assert_equal(g.neighbors(1), vec![(0, 10), (3, 30)]);
+        assert_equal(g.neighbors(2), vec![(0, 20)]);
+        assert_equal(g.neighbors(3), vec![(1, 30), (0, 40)]);
+
+        assert_eq!(g.weight_of(0, 1), Some(10));
+        assert_eq!(g.weight_of(3, 1), Some(30));
+        assert_eq!(g.weight_of(1, 2), None);
+    }
+
+    #[test]
+    fn graph_mat_new() {
+        {
+            let g = GraphMat::<i32>::new(0);
+            assert_eq!(g.node_count(), 0);
+            assert_eq!(g.edge_count(), 0);
+        }
+        {
+            let g = GraphMat::<i32>::new(1);
+            assert_eq!(g.node_count(), 1);
+            assert_eq!(g.edge_count(), 0);
+        }
+        {
+            let g = GraphMat::<i32>::new(10);
+            assert_eq!(g.node_count(), 10);
+            assert_eq!(g.edge_count(), 0);
+        }
+    }
+
+    #[test]
+    fn graph_mat_from_edges() {
+        let edges = [
+            GraphEdge::new(0, 1, 10),
+            GraphEdge::new(0, 2, 20),
+            GraphEdge::new(1, 3, 30),
+            GraphEdge::new(3, 0, 40),
+            GraphEdge::new(3, 1, 50),
+        ];
+        let g = GraphMat::from_edges(4, &edges);
 
         assert_eq!(g.node_count(), 4);
         assert_eq!(g.edge_count(), 5);
 
-        assert_equal(
-            g.edges_from(0),
-            vec![GraphEdge::new(1, 10), GraphEdge::new(2, 20)],
-        );
-        assert_equal(g.edges_from(1), vec![GraphEdge::new(3, 30)]);
-        assert_eq!(g.edges_from(2).next(), None);
-        assert_equal(
-            g.edges_from(3),
-            vec![GraphEdge::new(0, 40), GraphEdge::new(1, 50)],
-        );
+        assert_equal(g.neighbors(0), vec![(1, 10), (2, 20)]);
+        assert_equal(g.neighbors(1), vec![(3, 30)]);
+        assert_equal(g.neighbors(2), vec![]);
+        assert_equal(g.neighbors(3), vec![(0, 40), (1, 50)]);
 
         assert_eq!(g.weight_of(0, 1), Some(10));
         assert_eq!(g.weight_of(3, 1), Some(50));
         assert_eq!(g.weight_of(0, 3), None);
+    }
+
+    #[test]
+    fn graph_mat_from_edges_bidi() {
+        let edges = [
+            GraphEdge::new(0, 1, 10),
+            GraphEdge::new(0, 2, 20),
+            GraphEdge::new(1, 3, 30),
+            GraphEdge::new(3, 0, 40),
+        ];
+        let g = GraphMat::from_edges_bidi(4, &edges);
+
+        assert_eq!(g.node_count(), 4);
+        assert_eq!(g.edge_count(), 8);
+
+        assert_equal(g.neighbors(0), vec![(1, 10), (2, 20), (3, 40)]);
+        assert_equal(g.neighbors(1), vec![(0, 10), (3, 30)]);
+        assert_equal(g.neighbors(2), vec![(0, 20)]);
+        assert_equal(g.neighbors(3), vec![(0, 40), (1, 30)]);
+
+        assert_eq!(g.weight_of(0, 1), Some(10));
+        assert_eq!(g.weight_of(3, 1), Some(30));
+        assert_eq!(g.weight_of(1, 2), None);
     }
 }

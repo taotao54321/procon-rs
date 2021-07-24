@@ -11,22 +11,15 @@ fn main() {
         m: usize,
         start: usize,
         goal: usize,
+        edges: [GraphEdgeSrcDstWeight<u64>; m],
     }
 
-    let mut g = GraphVV::<u64>::new(n);
-    for _ in 0..m {
-        input! {
-            src: usize,
-            dst: usize,
-            weight: u64,
-        }
-        g.add_edge(src, GraphEdge::new(dst, weight));
-    }
+    let g = GraphVV::from_edges(n, &edges);
 
-    let res = sssp_dijkstra(&g, start);
+    let sssp = sssp_dijkstra(&g, start);
 
-    if let Some(path) = res.path_to(goal) {
-        println!("{} {}", res.distance_to(goal).unwrap(), path.len() - 1);
+    if let Some(path) = sssp.path_to(goal) {
+        println!("{} {}", sssp.distance_to(goal).unwrap(), path.len() - 1);
         for e in path.windows(2) {
             println!("{} {}", e[0], e[1]);
         }
