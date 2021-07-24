@@ -23,7 +23,7 @@ pub trait WeightBase:
     + std::iter::Sum
     + num_traits::Zero
     + num_traits::One
-    + num_traits::Bounded
+    + taocp_prelude::Inf
 {
 }
 
@@ -43,7 +43,7 @@ impl<T> WeightBase for T where
         + std::iter::Sum
         + num_traits::Zero
         + num_traits::One
-        + num_traits::Bounded
+        + taocp_prelude::Inf
 {
 }
 

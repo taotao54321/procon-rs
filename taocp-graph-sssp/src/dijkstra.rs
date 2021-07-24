@@ -11,14 +11,14 @@ pub struct SsspDijkstra<W> {
 
 impl<W: WeightBase> SsspDijkstra<W> {
     pub fn distance_to(&self, dst: usize) -> Option<W> {
-        if self.ds[dst] == Self::inf() {
+        if self.ds[dst] == W::INF {
             return None;
         }
         Some(self.ds[dst])
     }
 
     pub fn path_to(&self, dst: usize) -> Option<Vec<usize>> {
-        if self.ds[dst] == Self::inf() {
+        if self.ds[dst] == W::INF {
             return None;
         }
 
@@ -34,14 +34,10 @@ impl<W: WeightBase> SsspDijkstra<W> {
         Some(path)
     }
 
-    fn inf() -> W {
-        W::max_value()
-    }
-
     fn new(n: usize, start: usize) -> Self {
         Self {
             start,
-            ds: vec![Self::inf(); n],
+            ds: vec![W::INF; n],
             ps: vec![usize::max_value(); n],
         }
     }
@@ -134,13 +130,13 @@ mod tests {
     #[test]
     fn test_sssp_dijkstra() {
         {
-            let g = GraphVV::<u32>::new(1);
+            let g = GraphVV::<i32>::new(1);
             let sssp = sssp_dijkstra(&g, 0);
             assert_eq!(sssp.distance_to(0), Some(0));
             assert_eq!(sssp.path_to(0), Some(vec![0]));
         }
         {
-            let g = GraphVV::<u32>::new(2);
+            let g = GraphVV::<i32>::new(2);
             let sssp = sssp_dijkstra(&g, 0);
             assert_eq!(sssp.distance_to(0), Some(0));
             assert_eq!(sssp.distance_to(1), None);
@@ -165,7 +161,7 @@ mod tests {
                 from source,
                 n: usize,
                 m: usize,
-                edges: [GraphEdgeSrcDstWeight<u32>; m],
+                edges: [GraphEdgeSrcDstWeight<i32>; m],
             }
 
             let g = GraphVV::from_edges(n, &edges);

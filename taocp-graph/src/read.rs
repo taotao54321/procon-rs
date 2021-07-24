@@ -143,7 +143,7 @@ mod tests {
             from source,
             n: usize,
             m: usize,
-            edges: [GraphEdgeSrcDstWeight<u32>; m],
+            edges: [GraphEdgeSrcDstWeight<i32>; m],
         }
 
         let g = GraphVV::from_edges(n, &edges);
@@ -171,7 +171,7 @@ mod tests {
             from source,
             n: usize,
             m: usize,
-            edges: [GraphEdgeSrcDst1Weight<u32>; m],
+            edges: [GraphEdgeSrcDst1Weight<i32>; m],
         }
 
         let g = GraphVV::from_edges(n, &edges);

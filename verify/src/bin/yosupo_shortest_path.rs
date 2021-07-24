@@ -11,7 +11,7 @@ fn main() {
         m: usize,
         start: usize,
         goal: usize,
-        edges: [GraphEdgeSrcDstWeight<u64>; m],
+        edges: [GraphEdgeSrcDstWeight<i64>; m],
     }
 
     let g = GraphVV::from_edges(n, &edges);
