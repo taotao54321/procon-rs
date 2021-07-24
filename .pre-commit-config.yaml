@@ -35,6 +35,11 @@ repos:
         entry: cargo fmt -- --check
         pass_filenames: false
 
+      - id: clippy-hack
+        name: clippy-hack
+        language: system
+        entry: sh -c 'fd -e rs | xargs touch'
+
       - id: cargo-clippy
         name: cargo-clippy
         language: system
