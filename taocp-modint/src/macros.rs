@@ -298,14 +298,16 @@ macro_rules! impl_iter_traits {
         // Sum
         impl<$($param: $bound),*> ::std::iter::Sum<Self> for $modint {
             fn sum<I>(it: I) -> Self
-            where I: ::std::iter::Iterator<Item=Self>,
+            where
+                I: ::std::iter::Iterator<Item = Self>,
             {
                 it.fold(Self::new_unchecked(0), ::std::ops::Add::add)
             }
         }
         impl<'a, $($param: $bound),*> ::std::iter::Sum<&'a Self> for $modint {
             fn sum<I>(it: I) -> Self
-            where I: ::std::iter::Iterator<Item=&'a Self>,
+            where
+                I: ::std::iter::Iterator<Item = &'a Self>,
             {
                 it.fold(Self::new_unchecked(0), ::std::ops::Add::add)
             }
@@ -314,14 +316,16 @@ macro_rules! impl_iter_traits {
         // Product
         impl<$($param: $bound),*> ::std::iter::Product<Self> for $modint {
             fn product<I>(it: I) -> Self
-            where I: ::std::iter::Iterator<Item=Self>,
+            where
+                I: ::std::iter::Iterator<Item = Self>,
             {
                 it.fold(Self::new_unchecked(1), ::std::ops::Mul::mul)
             }
         }
         impl<'a, $($param: $bound),*> ::std::iter::Product<&'a Self> for $modint {
             fn product<I>(it: I) -> Self
-            where I: ::std::iter::Iterator<Item=&'a Self>,
+            where
+                I: ::std::iter::Iterator<Item = &'a Self>,
             {
                 it.fold(Self::new_unchecked(1), ::std::ops::Mul::mul)
             }
