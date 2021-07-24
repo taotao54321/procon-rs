@@ -227,6 +227,8 @@ impl<W: WeightBase> GraphBase for GraphMat<W> {
 mod tests {
     use itertools::assert_equal;
 
+    use taocp_prelude::OrdFloat;
+
     use super::*;
 
     #[test]
@@ -243,6 +245,11 @@ mod tests {
         }
         {
             let g = GraphVV::<i32>::new(10);
+            assert_eq!(g.node_count(), 10);
+            assert_eq!(g.edge_count(), 0);
+        }
+        {
+            let g = GraphVV::<OrdFloat<f64>>::new(10);
             assert_eq!(g.node_count(), 10);
             assert_eq!(g.edge_count(), 0);
         }

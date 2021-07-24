@@ -9,3 +9,5 @@ taocp-graph = { path = "../taocp-graph" }
 
 [dev-dependencies]
 proconio = "=0.3.6"
+
+taocp-prelude = { path = "../taocp-prelude" }

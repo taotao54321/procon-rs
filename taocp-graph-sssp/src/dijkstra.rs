@@ -124,11 +124,12 @@ mod tests {
     use proconio::{input, source::once::OnceSource};
 
     use taocp_graph::{GraphEdgeSrcDstWeight, GraphVV};
+    use taocp_prelude::OrdFloat;
 
     use super::*;
 
     #[test]
-    fn test_sssp_dijkstra() {
+    fn sssp_dijkstra_trivial() {
         {
             let g = GraphVV::<i32>::new(1);
             let sssp = sssp_dijkstra(&g, 0);
@@ -143,9 +144,12 @@ mod tests {
             assert_eq!(sssp.path_to(0), Some(vec![0]));
             assert_eq!(sssp.path_to(1), None);
         }
-        {
-            // sample of https://judge.yosupo.jp/problem/shortest_path
-            #[rustfmt::skip]
+    }
+
+    #[test]
+    fn sssp_dijkstra_int() {
+        // sample of https://judge.yosupo.jp/problem/shortest_path
+        #[rustfmt::skip]
             let source = OnceSource::from(r#"
                 5 7
                 0 3 5
@@ -157,18 +161,46 @@ mod tests {
                 1 0 1
             "#);
 
-            input! {
-                from source,
-                n: usize,
-                m: usize,
-                edges: [GraphEdgeSrcDstWeight<i32>; m],
-            }
-
-            let g = GraphVV::from_edges(n, &edges);
-            let sssp = sssp_dijkstra(&g, 2);
-
-            assert_eq!(sssp.distance_to(3), Some(11));
-            assert_eq!(sssp.path_to(3), Some(vec![2, 1, 0, 3]));
+        input! {
+            from source,
+            n: usize,
+            m: usize,
+            edges: [GraphEdgeSrcDstWeight<i32>; m],
         }
+
+        let g = GraphVV::from_edges(n, &edges);
+        let sssp = sssp_dijkstra(&g, 2);
+
+        assert_eq!(sssp.distance_to(3), Some(11));
+        assert_eq!(sssp.path_to(3), Some(vec![2, 1, 0, 3]));
+    }
+
+    #[test]
+    fn sssp_dijkstra_float() {
+        // sample of https://judge.yosupo.jp/problem/shortest_path
+        #[rustfmt::skip]
+            let source = OnceSource::from(r#"
+                5 7
+                0 3 5
+                0 4 3
+                2 4 2
+                4 3 10
+                4 0 7
+                2 1 5
+                1 0 1
+            "#);
+
+        input! {
+            from source,
+            n: usize,
+            m: usize,
+            edges: [GraphEdgeSrcDstWeight<OrdFloat<f64>>; m],
+        }
+
+        let g = GraphVV::from_edges(n, &edges);
+        let sssp = sssp_dijkstra(&g, 2);
+
+        assert_eq!(sssp.distance_to(3), Some(OrdFloat(11.)));
+        assert_eq!(sssp.path_to(3), Some(vec![2, 1, 0, 3]));
     }
 }
