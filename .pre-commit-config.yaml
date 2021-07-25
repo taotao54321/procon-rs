@@ -35,6 +35,13 @@ repos:
         entry: cargo fmt -- --check
         pass_filenames: false
 
+      - id: cargo-test
+        name: cargo-test
+        language: system
+        types: [file, rust]
+        entry: cargo test --workspace --
+        pass_filenames: false
+
       - id: clippy-hack
         name: clippy-hack
         language: system
@@ -47,16 +54,9 @@ repos:
         entry: cargo clippy --workspace --bins --tests --examples --
         pass_filenames: false
 
-      - id: cargo-test
-        name: cargo-test
-        language: system
-        types: [file, rust]
-        entry: cargo test --workspace --
-        pass_filenames: false
-
-      - id: oj-verify
-        name: oj-verify
-        language: system
-        types: [file, rust]
-        entry: oj-verify run
-        pass_filenames: false
+      #- id: oj-verify
+      #  name: oj-verify
+      #  language: system
+      #  types: [file, rust]
+      #  entry: oj-verify run
+      #  pass_filenames: false
