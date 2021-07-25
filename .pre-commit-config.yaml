@@ -51,7 +51,7 @@ repos:
         name: cargo-test
         language: system
         types: [file, rust]
-        entry: cargo test --
+        entry: cargo test --workspace --
         pass_filenames: false
 
       - id: oj-verify
