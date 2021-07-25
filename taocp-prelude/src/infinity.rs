@@ -1,6 +1,14 @@
 use crate::float::OrdFloat;
 
-pub trait Inf: Copy {
+pub trait Inf:
+    Copy
+    + PartialEq
+    + PartialOrd
+    + std::fmt::Debug
+    + std::fmt::Display
+    + std::ops::Neg<Output = Self>
+    + num_traits::Signed
+{
     const INF: Self;
 }
 
