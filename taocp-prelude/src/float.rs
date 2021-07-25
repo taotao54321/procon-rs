@@ -13,21 +13,21 @@ use num_traits::{
 
 /// 浮動小数点数に Ord を実装するラッパー。
 ///
-/// FromStr トレイトは NaN をパースしない仕様とする。
+/// FromStr トレイトは inf, NaN をパースしない仕様とする。
 #[derive(Clone, Copy, Default)]
 pub struct OrdFloat<T>(pub T);
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum ParseOrdFloatError {
     ParseFloatError(std::num::ParseFloatError),
-    Nan,
+    NotFinite,
 }
 
 impl Display for ParseOrdFloatError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Self::ParseFloatError(e) => Display::fmt(e, f),
-            Self::Nan => write!(f, "NaN is not permitted"),
+            Self::NotFinite => write!(f, "inf and NaN is not permitted"),
         }
     }
 }
@@ -36,7 +36,7 @@ impl Error for ParseOrdFloatError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
             Self::ParseFloatError(e) => Some(e),
-            Self::Nan => None,
+            Self::NotFinite => None,
         }
     }
 }
@@ -122,10 +122,10 @@ macro_rules! impl_basic_traits {
                 fn from_str(s: &str) -> Result<Self, Self::Err> {
                     match <$ty as FromStr>::from_str(s) {
                         Ok(x) => {
-                            if !x.is_nan() {
+                            if x.is_finite() {
                                 Ok(Self(x))
                             } else {
-                                Err(ParseOrdFloatError::Nan)
+                                Err(ParseOrdFloatError::NotFinite)
                             }
                         }
                         Err(e) => Err(ParseOrdFloatError::ParseFloatError(e)),
@@ -756,7 +756,20 @@ mod tests {
     fn ord_float_from_str() {
         assert_eq!("0.".parse(), Ok(OrdFloat(0.)));
         assert_eq!("1.".parse(), Ok(OrdFloat(1.)));
-        assert_eq!("NaN".parse::<OrdFloat<f32>>(), Err(ParseOrdFloatError::Nan));
+
+        assert_eq!(
+            "inf".parse::<OrdFloat<f32>>(),
+            Err(ParseOrdFloatError::NotFinite)
+        );
+        assert_eq!(
+            "-inf".parse::<OrdFloat<f32>>(),
+            Err(ParseOrdFloatError::NotFinite)
+        );
+        assert_eq!(
+            "NaN".parse::<OrdFloat<f32>>(),
+            Err(ParseOrdFloatError::NotFinite)
+        );
+
         assert!(matches!(
             "abc".parse::<OrdFloat<f32>>(),
             Err(ParseOrdFloatError::ParseFloatError(_))
