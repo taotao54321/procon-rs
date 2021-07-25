@@ -23,10 +23,12 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
+          ~/.cargo/bin
+          ~/.cargo/env
           ~/.rustup/settings.toml
           ~/.rustup/toolchains
           ~/.rustup/update-hashes
-        key: rust-toolchain-${{ hashFiles('rust-toolchain') }}
+        key: rust-toolchain-${{ steps.toolchain.outputs.rustc_hash }}
 
     - name: Setup Python
       uses: actions/setup-python@v2
@@ -41,13 +43,13 @@ jobs:
         key: python-${{ env.pythonLocation }}
 
     - name: Run cargo build
-      run: cargo build --verbose
+      run: cargo build
 
     - name: Run cargo clippy
       run: cargo clippy --workspace --bins --tests --examples --
 
     - name: Run cargo test
-      run: cargo test --workspace --verbose --
+      run: cargo test --workspace --
 
     - name: Run oj-verify
       env:
@@ -59,12 +61,11 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          ~/.cargo/bin
-          ~/.cargo/env
           ~/.cargo/git
           ~/.cargo/registry/index
           ~/.cargo/registry/cache
           target
+        key: cargo-${{ steps.toolchain.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.*') }}
 
     - name: Check cache
       run: |
