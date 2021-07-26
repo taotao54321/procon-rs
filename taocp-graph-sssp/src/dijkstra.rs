@@ -10,13 +10,14 @@ pub struct SsspDijkstra<W> {
 }
 
 impl<W: WeightBase> SsspDijkstra<W> {
-    pub fn distance_to(&self, dst: usize) -> Option<W> {
-        if self.ds[dst] == W::INF {
-            return None;
-        }
-        Some(self.ds[dst])
+    /// 始点から dst への最短距離を返す。
+    /// dst が到達不能な場合、W::INF を返す。
+    pub fn distance_to(&self, dst: usize) -> W {
+        self.ds[dst]
     }
 
+    /// 始点から dst への最短経路 [start, ..., dst] を返す。
+    /// dst が到達不能な場合、None を返す。
     pub fn path_to(&self, dst: usize) -> Option<Vec<usize>> {
         if self.ds[dst] == W::INF {
             return None;
@@ -124,7 +125,7 @@ mod tests {
     use proconio::{input, source::once::OnceSource};
 
     use taocp_graph::{GraphEdgeSrcDstWeight, GraphVV};
-    use taocp_prelude::OrdFloat;
+    use taocp_prelude::{Inf, OrdFloat};
 
     use super::*;
 
@@ -133,14 +134,14 @@ mod tests {
         {
             let g = GraphVV::<i32>::new(1);
             let sssp = sssp_dijkstra(&g, 0);
-            assert_eq!(sssp.distance_to(0), Some(0));
+            assert_eq!(sssp.distance_to(0), 0);
             assert_eq!(sssp.path_to(0), Some(vec![0]));
         }
         {
             let g = GraphVV::<i32>::new(2);
             let sssp = sssp_dijkstra(&g, 0);
-            assert_eq!(sssp.distance_to(0), Some(0));
-            assert_eq!(sssp.distance_to(1), None);
+            assert_eq!(sssp.distance_to(0), 0);
+            assert_eq!(sssp.distance_to(1), i32::INF);
             assert_eq!(sssp.path_to(0), Some(vec![0]));
             assert_eq!(sssp.path_to(1), None);
         }
@@ -150,16 +151,16 @@ mod tests {
     fn sssp_dijkstra_int() {
         // sample of https://judge.yosupo.jp/problem/shortest_path
         #[rustfmt::skip]
-            let source = OnceSource::from(r#"
-                5 7
-                0 3 5
-                0 4 3
-                2 4 2
-                4 3 10
-                4 0 7
-                2 1 5
-                1 0 1
-            "#);
+        let source = OnceSource::from(r#"
+            5 7
+            0 3 5
+            0 4 3
+            2 4 2
+            4 3 10
+            4 0 7
+            2 1 5
+            1 0 1
+        "#);
 
         input! {
             from source,
@@ -171,7 +172,7 @@ mod tests {
         let g = GraphVV::from_edges(n, &edges);
         let sssp = sssp_dijkstra(&g, 2);
 
-        assert_eq!(sssp.distance_to(3), Some(11));
+        assert_eq!(sssp.distance_to(3), 11);
         assert_eq!(sssp.path_to(3), Some(vec![2, 1, 0, 3]));
     }
 
@@ -179,16 +180,16 @@ mod tests {
     fn sssp_dijkstra_float() {
         // sample of https://judge.yosupo.jp/problem/shortest_path
         #[rustfmt::skip]
-            let source = OnceSource::from(r#"
-                5 7
-                0 3 5
-                0 4 3
-                2 4 2
-                4 3 10
-                4 0 7
-                2 1 5
-                1 0 1
-            "#);
+        let source = OnceSource::from(r#"
+            5 7
+            0 3 5
+            0 4 3
+            2 4 2
+            4 3 10
+            4 0 7
+            2 1 5
+            1 0 1
+        "#);
 
         input! {
             from source,
@@ -200,7 +201,7 @@ mod tests {
         let g = GraphVV::from_edges(n, &edges);
         let sssp = sssp_dijkstra(&g, 2);
 
-        assert_eq!(sssp.distance_to(3), Some(OrdFloat(11.)));
+        assert_eq!(sssp.distance_to(3), OrdFloat(11.));
         assert_eq!(sssp.path_to(3), Some(vec![2, 1, 0, 3]));
     }
 }

@@ -19,7 +19,7 @@ fn main() {
     let sssp = sssp_dijkstra(&g, start);
 
     if let Some(path) = sssp.path_to(goal) {
-        println!("{} {}", sssp.distance_to(goal).unwrap(), path.len() - 1);
+        println!("{} {}", sssp.distance_to(goal), path.len() - 1);
         for e in path.windows(2) {
             println!("{} {}", e[0], e[1]);
         }

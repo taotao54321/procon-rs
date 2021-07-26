@@ -68,5 +68,6 @@ jobs:
     - name: Run oj-verify
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DROPBOX_TOKEN: ${{ secrets.DROPBOX_TOKEN }}
         YUKICODER_TOKEN: ${{ secrets.YUKICODER_TOKEN }}
       run: oj-verify run --jobs 2
