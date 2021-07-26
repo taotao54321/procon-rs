@@ -74,6 +74,7 @@ where
     let mut state = SsspBellmanFord::new(n, start);
     state.ds[start] = W::zero();
 
+    // 到達可能な負閉路がない場合、n-1 回の反復で全頂点への真の最短距離が求まる。
     for _ in 0..n - 1 {
         let mut relaxed = false;
 
@@ -92,6 +93,8 @@ where
         }
     }
 
+    // n 回目の反復。
+    // ここで緩和が起こった場合、辺の行き先への真の最短距離は -INF となる。
     {
         let mut relaxed = false;
 
@@ -113,6 +116,8 @@ where
         }
     }
 
+    // n+1 回目以降の反復。
+    // -INF が全ての負閉路上の頂点に伝播するには最大 n-1 回の反復が必要。
     for _ in 0..n - 1 {
         let mut relaxed = false;
 
@@ -137,10 +142,46 @@ where
 mod tests {
     use proconio::{input, source::once::OnceSource};
 
-    use taocp_graph::{GraphEdgeSrcDstWeight, GraphVV};
+    use taocp_graph::{GraphEdge, GraphEdgeSrcDstWeight, GraphVV};
     use taocp_prelude::Inf;
 
     use super::*;
+
+    #[test]
+    fn sssp_bellman_ford_trivial() {
+        {
+            let g = GraphVV::<i32>::new(1);
+            let sssp = sssp_bellman_ford(&g, 0);
+            assert_eq!(sssp.distance_to(0), 0);
+            assert_eq!(sssp.path_to(0), Some(vec![0]));
+        }
+        {
+            let g = GraphVV::<i32>::new(2);
+            let sssp = sssp_bellman_ford(&g, 0);
+            assert_eq!(sssp.distance_to(0), 0);
+            assert_eq!(sssp.distance_to(1), i32::INF);
+            assert_eq!(sssp.path_to(0), Some(vec![0]));
+            assert_eq!(sssp.path_to(1), None);
+        }
+        {
+            let g = GraphVV::<i32>::new(2);
+            let sssp = sssp_bellman_ford(&g, 1);
+            assert_eq!(sssp.distance_to(0), i32::INF);
+            assert_eq!(sssp.distance_to(1), 0);
+            assert_eq!(sssp.path_to(0), None);
+            assert_eq!(sssp.path_to(1), Some(vec![1]));
+        }
+        {
+            let g = GraphVV::from_edges(3, &[GraphEdge::new(2, 1, 1), GraphEdge::new(1, 1, -1)]);
+            let sssp = sssp_bellman_ford(&g, 2);
+            assert_eq!(sssp.distance_to(0), i32::INF);
+            assert_eq!(sssp.distance_to(1), -i32::INF);
+            assert_eq!(sssp.distance_to(2), 0);
+            assert_eq!(sssp.path_to(0), None);
+            assert_eq!(sssp.path_to(1), None);
+            assert_eq!(sssp.path_to(2), Some(vec![2]));
+        }
+    }
 
     #[test]
     fn sssp_bellman_ford_normal() {

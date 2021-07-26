@@ -145,6 +145,14 @@ mod tests {
             assert_eq!(sssp.path_to(0), Some(vec![0]));
             assert_eq!(sssp.path_to(1), None);
         }
+        {
+            let g = GraphVV::<i32>::new(2);
+            let sssp = sssp_dijkstra(&g, 1);
+            assert_eq!(sssp.distance_to(0), i32::INF);
+            assert_eq!(sssp.distance_to(1), 0);
+            assert_eq!(sssp.path_to(0), None);
+            assert_eq!(sssp.path_to(1), Some(vec![1]));
+        }
     }
 
     #[test]
