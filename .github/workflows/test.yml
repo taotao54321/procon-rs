@@ -63,7 +63,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: .verify-helper/cache
-        key: oj-verify-${{ hashFiles('.verify-helper-cache-key') }}
+        key: oj-verify-${{ hashFiles('verify/**/*.rs') }}
 
     - name: Run oj-verify
       env:
