@@ -35,6 +35,8 @@ impl<W: WeightBase> SsspBellmanFord<W> {
         Some(path)
     }
 
+    /// 始点から到達可能な負閉路があるかどうかを返す。
+    /// 到達不能な負閉路については関知しないことに注意。
     pub fn has_negative_cycle(&self) -> bool {
         self.has_negative_cycle
     }
@@ -56,11 +58,6 @@ impl<W: WeightBase> SsspBellmanFord<W> {
         } else {
             false
         }
-    }
-
-    fn mark_negative_cycle(&mut self, v: usize) {
-        self.ds[v] = -W::INF;
-        self.has_negative_cycle = true;
     }
 }
 
@@ -105,7 +102,8 @@ where
 
             for (dst, weight) in g.neighbors(src) {
                 if state.ds[src] + weight < state.ds[dst] {
-                    state.mark_negative_cycle(dst);
+                    state.ds[dst] = -W::INF;
+                    state.has_negative_cycle = true;
                     relaxed = true;
                 }
             }
@@ -124,7 +122,7 @@ where
         for src in 0..n {
             if state.ds[src] == -W::INF {
                 for (dst, _) in g.neighbors(src) {
-                    state.mark_negative_cycle(dst);
+                    state.ds[dst] = -W::INF;
                     relaxed = true;
                 }
             }
@@ -152,12 +150,14 @@ mod tests {
         {
             let g = GraphVV::<i32>::new(1);
             let sssp = sssp_bellman_ford(&g, 0);
+            assert!(!sssp.has_negative_cycle());
             assert_eq!(sssp.distance_to(0), 0);
             assert_eq!(sssp.path_to(0), Some(vec![0]));
         }
         {
             let g = GraphVV::<i32>::new(2);
             let sssp = sssp_bellman_ford(&g, 0);
+            assert!(!sssp.has_negative_cycle());
             assert_eq!(sssp.distance_to(0), 0);
             assert_eq!(sssp.distance_to(1), i32::INF);
             assert_eq!(sssp.path_to(0), Some(vec![0]));
@@ -166,6 +166,7 @@ mod tests {
         {
             let g = GraphVV::<i32>::new(2);
             let sssp = sssp_bellman_ford(&g, 1);
+            assert!(!sssp.has_negative_cycle());
             assert_eq!(sssp.distance_to(0), i32::INF);
             assert_eq!(sssp.distance_to(1), 0);
             assert_eq!(sssp.path_to(0), None);
@@ -174,6 +175,7 @@ mod tests {
         {
             let g = GraphVV::from_edges(3, &[GraphEdge::new(2, 1, 1), GraphEdge::new(1, 1, -1)]);
             let sssp = sssp_bellman_ford(&g, 2);
+            assert!(sssp.has_negative_cycle());
             assert_eq!(sssp.distance_to(0), i32::INF);
             assert_eq!(sssp.distance_to(1), -i32::INF);
             assert_eq!(sssp.distance_to(2), 0);
