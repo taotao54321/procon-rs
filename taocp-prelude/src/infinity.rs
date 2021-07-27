@@ -1,5 +1,8 @@
 use crate::float::OrdFloat;
 
+/// * 符号付き。
+/// * 2 倍してもオーバーフローしない。
+/// * 絶対値が競プロの一般的な制約より大きい。
 pub trait Inf:
     Copy
     + PartialEq
