@@ -34,14 +34,8 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v2
 
-    - name: Cache Python environment
-      uses: actions/cache@v2
-      with:
-        path: ${{ env.pythonLocation }}
-        key: ${{ runner.os }}-python-${{ env.pythonLocation }}
-
     - name: Install online-judge-verify-helper
-      run: pip3 install --upgrade --upgrade-strategy eager online-judge-verify-helper
+      run: pip3 install --upgrade online-judge-verify-helper
 
     - name: Cache cargo deps
       uses: actions/cache@v2
