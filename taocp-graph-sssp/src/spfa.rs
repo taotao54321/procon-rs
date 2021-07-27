@@ -106,8 +106,10 @@ where
         let (src, edge_count) = queue.pop();
 
         for (dst, _) in g.neighbors(src) {
-            state.ds[dst] = -W::INF;
-            queue.push(dst, edge_count + 1);
+            if state.ds[dst] != -W::INF {
+                state.ds[dst] = -W::INF;
+                queue.push(dst, edge_count + 1);
+            }
         }
     }
 

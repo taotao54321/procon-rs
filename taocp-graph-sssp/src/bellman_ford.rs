@@ -120,8 +120,12 @@ where
         let mut relaxed = false;
 
         for src in 0..n {
-            if state.ds[src] == -W::INF {
-                for (dst, _) in g.neighbors(src) {
+            if state.ds[src] != -W::INF {
+                continue;
+            }
+
+            for (dst, _) in g.neighbors(src) {
+                if state.ds[dst] != -W::INF {
                     state.ds[dst] = -W::INF;
                     relaxed = true;
                 }
