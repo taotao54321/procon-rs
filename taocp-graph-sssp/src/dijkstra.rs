@@ -76,8 +76,7 @@ where
     relax!(start, start, W::zero());
 
     let mut remain = n;
-    while !heap.is_empty() {
-        let HeapEntry { v: src, d } = heap.pop().unwrap();
+    while let Some(HeapEntry { v: src, d }) = heap.pop() {
         if state.ds[src] < d {
             continue;
         }
