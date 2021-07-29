@@ -1,4 +1,4 @@
-use std::collections::BinaryHeap;
+use std::collections::{BinaryHeap, VecDeque};
 
 use taocp_graph::{GraphBase, WeightBase};
 
@@ -54,7 +54,6 @@ where
 }
 
 /// 負閉路がある場合、None を返す。
-/// TODO: ベルマンフォードからSPFAに変更
 fn get_potential<G, W>(g: &G) -> Option<Vec<W>>
 where
     G: GraphBase<Weight = W>,
@@ -63,35 +62,70 @@ where
     let n = g.node_count();
 
     let mut hs = vec![W::zero(); n];
+    let mut queue = SpfaQueue::new(n);
 
-    for _ in 0..n - 1 {
-        let mut relaxed = false;
+    while !queue.is_empty() && queue.peek_edge_count() < n - 1 {
+        let (src, edge_count) = queue.pop();
 
-        for src in 0..n {
-            for (dst, weight) in g.neighbors(src) {
-                let h_new = hs[src] + weight;
-                if h_new < hs[dst] {
-                    hs[dst] = h_new;
-                    relaxed = true;
-                }
-            }
-        }
-
-        if !relaxed {
-            return Some(hs);
-        }
-    }
-
-    for src in 0..n {
         for (dst, weight) in g.neighbors(src) {
             let h_new = hs[src] + weight;
             if h_new < hs[dst] {
+                hs[dst] = h_new;
+                queue.push(dst, edge_count + 1);
+            }
+        }
+    }
+
+    while !queue.is_empty() {
+        let (src, _) = queue.pop();
+
+        for (dst, weight) in g.neighbors(src) {
+            if hs[src] + weight < hs[dst] {
                 return None;
             }
         }
     }
 
     Some(hs)
+}
+
+#[derive(Debug)]
+struct SpfaQueue {
+    queue: VecDeque<(usize, usize)>,
+    contains: Vec<bool>,
+}
+
+impl SpfaQueue {
+    fn new(n: usize) -> Self {
+        let queue: VecDeque<_> = (0..n).map(|v| (v, 0)).collect();
+
+        Self {
+            queue,
+            contains: vec![true; n],
+        }
+    }
+
+    fn is_empty(&self) -> bool {
+        self.queue.is_empty()
+    }
+
+    fn push(&mut self, v: usize, edge_count: usize) {
+        if !self.contains[v] {
+            self.queue.push_back((v, edge_count));
+            self.contains[v] = true;
+        }
+    }
+
+    fn peek_edge_count(&self) -> usize {
+        self.queue.front().unwrap().1
+    }
+
+    fn pop(&mut self) -> (usize, usize) {
+        let (v, edge_count) = self.queue.pop_front().unwrap();
+        debug_assert!(self.contains[v]);
+        self.contains[v] = false;
+        (v, edge_count)
+    }
 }
 
 fn dijkstra<G, W>(g: &G, start: usize, hs: &[W]) -> (Vec<W>, Vec<usize>)
